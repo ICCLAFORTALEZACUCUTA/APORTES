@@ -595,7 +595,7 @@
         // ⚠️ REEMPLAZAR con la URL de implementación de tu Apps Script (termina en /exec)
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwI5mA0fHhXuHtJXZfDaKTCpxH8Cmhf6qrTuPEthFvz7vMcIWmv94uO53TtrFktrKHN/exec';
 
-        const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
         let APP_DATA = {
             token: localStorage.getItem('sessionToken'),
@@ -844,8 +844,8 @@
                     datasets: [{
                         label: 'Monto Recibido',
                         data: amounts,
-                        backgroundColor: var('--color-secundario'),
-                        borderColor: var('--color-secundario-light'),
+                        backgroundColor: '#10b981', // var(--color-secundario)
+                        borderColor: '#34d399', // var(--color-secundario-light)
                         borderWidth: 1
                     }]
                 },
@@ -865,7 +865,7 @@
                             anchor: 'end',
                             align: 'top',
                             formatter: (value) => formatMoney(value),
-                            color: var('--color-texto')
+                            color: '#333333' // var(--color-texto)
                         }
                     }
                 },
@@ -1023,6 +1023,7 @@
                 const isPagado = mes.pagado;
                 const mesAnio = mes.mesAnio;
                 const valor = formatMoney(mes.valor);
+                // Determinar si es deuda (pasado o presente)
                 const isDeuda = !isPagado && new Date(`${mesAnio.split('/')[1]}-${mesAnio.split('/')[0]}-01T00:00:00Z`).getTime() < Date.now();
                 
                 const clase = isPagado ? 'mes-pagado' : isDeuda ? 'mes-deuda' : 'mes-item';
