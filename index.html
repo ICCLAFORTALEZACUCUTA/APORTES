@@ -3,837 +3,1342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión Académica - Pagos y Notas</title>
+    <title>Sistema de Gestión Académica Modular</title>
+    <!-- Incluir Tailwind CSS para un diseño moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configuración de Tailwind para usar la fuente Inter
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Incluir D3.js para la simulación de gráficos en el Dashboard de Finanzas -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        /* Estilos Básicos */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7f6;
-    color: #333;
-}
-
-header {
-    background-color: #007bff;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-main {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.view {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-}
-
-/* Formularios y Entradas */
-form input[type="text"], 
-form input[type="password"], 
-form select,
-form textarea,
-#search-participante {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0 16px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-.error-text {
-    color: red;
-    font-weight: bold;
-}
-
-/* Tabs */
-.tabs {
-    display: flex;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ddd;
-}
-
-.tab-button {
-    background-color: #f1f1f1;
-    color: #333;
-    padding: 10px 15px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px 5px 0 0;
-    margin-right: 5px;
-    transition: background-color 0.3s;
-}
-
-.tab-button.active {
-    background-color: white;
-    border: 2px solid #ddd;
-    border-bottom: 2px solid white;
-}
-
-.tab-content {
-    padding: 10px 0;
-}
-
-/* Tablas */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-table th, table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-
-.deuda-pendiente {
-    color: #dc3545;
-    font-size: 1.2em;
-}
-
-/* Responsividad */
-@media (max-width: 600px) {
-    header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .view {
-        padding: 10px;
-    }
-    
-    .tabs {
-        flex-direction: column;
-    }
-    
-    .tab-button {
-        width: 100%;
-        margin-bottom: 5px;
-    }
-
-    /* Ocultar algunas columnas en móviles */
-    #participantes-table th:nth-child(3), 
-    #participantes-table td:nth-child(3) {
-        display: none; 
-    }
-}
-
-/* Estilos de Meses (para el formulario de pago) */
-#meses-pendientes-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-.mes-item {
-    padding: 5px 10px;
-    border: 1px solid #007bff;
-    border-radius: 4px;
-    background-color: #e9f7ff;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-.mes-item.selected {
-    background-color: #007bff;
-    color: white;
-    border-color: #0056b3;
-}
-
-/* Estilos de Modales */
-.modal {
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4); 
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; 
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; 
-    max-width: 500px;
-    border-radius: 8px;
-    position: relative;
-}
-
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .view-content {
+            min-height: 70vh;
+        }
+        /* Estilos para las tablas de Notas (Semáforo) */
+        .bg-red-light { background-color: #fceaea; } /* Nuevo: 0-15 días */
+        .bg-yellow-light { background-color: #fffde7; } /* Alerta: 10 días pasados */
+        .bg-green-light { background-color: #e9fbf0; } /* Solucionada */
+        
+        .tab-button.active {
+            border-bottom: 3px solid #0056b3;
+            color: #0056b3;
+        }
+        /* Ocultar scrollbar pero permitir scroll */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
     </style>
 </head>
-<body>
-    <header>
-        <h1>Sistema de Gestión</h1>
-        <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
+<body class="antialiased">
+    
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wider">Gestión de Aportes y Notas</h1>
+            <div class="flex space-x-4 items-center">
+                <span id="user-display" class="text-sm font-medium hidden sm:block"></span>
+                <button id="logout-btn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 hidden">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
     </header>
     
-    <main id="app-container">
-        <section id="login-view" class="view active">
-            <h2>Acceso al Sistema</h2>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Login View -->
+        <section id="login-view" class="view active max-w-md mx-auto bg-white p-8 rounded-xl shadow-2xl transition duration-500">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Acceso al Sistema</h2>
             <form id="login-form">
-                <input type="text" id="usuario" placeholder="Usuario/Código" required>
-                <input type="password" id="contrasena" placeholder="Contraseña" required>
-                <button type="submit">Ingresar</button>
-                <p id="login-message" class="error-text"></p>
+                <div class="mb-4">
+                    <label for="usuario" class="block text-sm font-medium text-gray-700">Usuario/Código</label>
+                    <input type="text" id="usuario" placeholder="Cód. o Nombre de Usuario" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div class="mb-6">
+                    <label for="contrasena" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <input type="password" id="contrasena" placeholder="Contraseña" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                    Ingresar
+                </button>
+                <p id="login-message" class="error-text mt-4 text-center text-red-600 font-semibold"></p>
             </form>
         </section>
 
+        <!-- Admin Dashboard View -->
         <section id="admin-dashboard-view" class="view" style="display: none;">
-            <h2>Dashboard Administrativo 📊</h2>
-            <nav class="tabs">
-                <button class="tab-button active" data-tab="gestion-participantes">Participantes</button>
-                <button class="tab-button" data-tab="gestion-notas">Notas</button>
-                <button class="tab-button" data-tab="registro-pagos">Registro Pagos</button>
-            </nav>
-            
-            <div id="gestion-participantes" class="tab-content active">
-                <h3>Listado de Participantes</h3>
-                <input type="text" id="search-participante" placeholder="Buscar por Nombre/Código">
-                <table id="participantes-table">
-                    <thead>
-                        <tr><th>Código</th><th>Participante</th><th>Deuda ($)</th><th>Ver Detalle</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            
-            <div id="gestion-notas" class="tab-content">
-                <h3>Gestión de Notas (Incidencias)</h3>
-                <button id="show-crear-nota">Crear Nueva Nota</button>
-                <table id="notas-table">
-                    <thead>
-                        <tr><th>ID</th><th>Participante</th><th>Situación</th><th>Estado</th><th>Acción</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <div class="bg-white p-6 rounded-xl shadow-xl">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Panel Administrativo</h2>
 
-            <div id="registro-pagos" class="tab-content">
-                <h3>Registro de Pagos</h3>
-                <form id="pago-form">
-                    <input type="text" id="pago-codigo" placeholder="Código Participante" required>
-                    <div id="meses-pendientes-container">
+                <!-- Tabs Navigation -->
+                <nav class="flex space-x-1 sm:space-x-4 border-b border-gray-200 mb-6 overflow-x-auto hide-scrollbar">
+                    <button class="tab-button py-3 px-3 sm:px-4 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150 active" data-tab="gestion-participantes">
+                        👤 Participantes
+                    </button>
+                    <button class="tab-button py-3 px-3 sm:px-4 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150" data-tab="gestion-finanzas">
+                        💰 Dashboard Dinero
+                    </button>
+                    <button class="tab-button py-3 px-3 sm:px-4 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150" data-tab="registro-aportes">
+                        💳 Registro Aportes
+                    </button>
+                    <button class="tab-button py-3 px-3 sm:px-4 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150" data-tab="gestion-notas">
+                        📝 Gestión de Notas
+                    </button>
+                    <button class="tab-button py-3 px-3 sm:px-4 text-sm font-medium text-gray-500 hover:text-blue-600 transition duration-150" data-tab="registro-gastos">
+                        📉 Registrar Gastos
+                    </button>
+                </nav>
+
+                <!-- TAB CONTENT CONTAINER -->
+                <div id="tab-content-container" class="view-content">
+
+                    <!-- MÓDULO 4: GESTIÓN DE PARTICIPANTES (DEFAULT) -->
+                    <div id="gestion-participantes" class="tab-content active transition duration-300 ease-in-out">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-semibold">Listado de Participantes</h3>
+                            <button id="show-crear-participante" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300 text-sm">
+                                + Nuevo Participante
+                            </button>
                         </div>
-                    <p>Deuda a pagar (seleccionada): <span id="monto-a-pagar">$0</span></p>
-                    <button type="submit">Registrar Pago</button>
-                    <p id="pago-message" class="error-text"></p>
-                </form>
+                        <input type="text" id="search-participante" placeholder="Buscar por Nombre o Código..." class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-4">
+                        
+                        <!-- Tabla y Estadísticas -->
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="md:col-span-2 overflow-x-auto shadow-lg rounded-lg border">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nacionalidad</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deuda ($)</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="participantes-table-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Data will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Estadísticas Rápidas -->
+                            <div class="md:col-span-1 p-4 border rounded-lg shadow-inner bg-gray-50">
+                                <h4 class="text-lg font-bold mb-3 text-blue-600">📊 Estadísticas Rápidas</h4>
+                                <div id="stats-content">
+                                    <p class="mb-2"><strong>Total Participantes:</strong> <span id="stat-total" class="font-bold text-xl">0</span></p>
+                                    <p class="mb-2"><strong>Pagos Frecuencia Media:</strong> <span id="stat-frecuencia" class="font-semibold">N/A</span></p>
+                                    <p class="mb-2"><strong>Total Aportado:</strong> <span id="stat-aportado" class="font-semibold text-green-600">$0</span></p>
+                                    <h5 class="font-semibold mt-4">Distribución Nacionalidad:</h5>
+                                    <ul id="stat-nacionalidad" class="list-disc list-inside ml-4 text-sm">
+                                        <!-- Nacionalidad data -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 1: DASHBOARD DE DINERO -->
+                    <div id="gestion-finanzas" class="tab-content hidden transition duration-300 ease-in-out">
+                        <h3 class="text-2xl font-semibold mb-4">💰 Dashboard de Dinero (Aportes vs Gastos)</h3>
+                        
+                        <!-- Filtros -->
+                        <div class="flex flex-wrap gap-4 mb-6 p-4 border rounded-lg bg-indigo-50">
+                            <select id="filter-year" class="px-3 py-2 border rounded-lg">
+                                <option value="">Todos los Años</option>
+                            </select>
+                            <select id="filter-month" class="px-3 py-2 border rounded-lg">
+                                <option value="">Todos los Meses</option>
+                            </select>
+                            <button onclick="updateFinanceDashboard()" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg shadow-md transition duration-300">
+                                Aplicar Filtro
+                            </button>
+                        </div>
+
+                        <!-- Gráficos -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <h4 class="font-bold text-lg mb-2">Aportes por Mes (Barras)</h4>
+                                <div id="chart-bar-container" class="h-64 flex justify-center items-center text-gray-400 border border-dashed rounded-lg">
+                                    [Gráfico de barras simulado]
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <h4 class="font-bold text-lg mb-2">Distribución de Gastos (Círculo)</h4>
+                                <div id="chart-pie-container" class="h-64 flex justify-center items-center text-gray-400 border border-dashed rounded-lg">
+                                    [Gráfico de círculo simulado]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 2: REGISTRO DE APORTES -->
+                    <div id="registro-aportes" class="tab-content hidden transition duration-300 ease-in-out">
+                        <h3 class="text-2xl font-semibold mb-4">💳 Registro de Aportes</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <!-- Formulario de Pago (2/3 de ancho) -->
+                            <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-md border">
+                                <h4 class="font-bold text-xl mb-4 text-blue-600">Registrar Nuevo Pago</h4>
+                                <input type="text" id="pago-codigo-busqueda" placeholder="Buscar por Código o Nombre del Participante" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-4">
+                                <div id="participante-info-pago" class="p-3 bg-gray-50 border rounded-lg mb-4 text-sm font-medium hidden">
+                                    <p>Participante Seleccionado: <strong id="pago-participante-nombre"></strong> (<span id="pago-participante-codigo"></span>)</p>
+                                </div>
+
+                                <form id="pago-form" class="mt-4">
+                                    <h5 class="font-bold mb-2">Meses Pendientes de Pago (Seleccione con Checkbox):</h5>
+                                    
+                                    <!-- Contenedor de Meses con Checkboxes -->
+                                    <div id="meses-pendientes-container" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 p-3 border rounded-lg bg-yellow-50 mb-4">
+                                        <p class="col-span-full text-center text-gray-500">Busque un participante para ver los meses.</p>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center bg-blue-100 p-3 rounded-lg shadow-inner">
+                                        <p class="font-bold text-lg">Monto Total a Pagar (Seleccionado):</p>
+                                        <span id="monto-a-pagar" class="font-extrabold text-2xl text-blue-700">$0.00</span>
+                                    </div>
+                                    
+                                    <button type="submit" id="btn-registrar-pago" class="w-full mt-6 py-3 px-4 rounded-lg text-white font-bold bg-blue-600 hover:bg-blue-700 transition duration-300 shadow-md">
+                                        Confirmar Registro de Pago
+                                    </button>
+                                    <p id="pago-message" class="error-text mt-4 text-center text-red-600 font-semibold"></p>
+                                </form>
+                            </div>
+
+                            <!-- Tabla de Aportes (1/3 de ancho) -->
+                            <div class="md:col-span-1 overflow-x-auto shadow-lg rounded-lg border">
+                                <h4 class="font-bold text-xl p-4 bg-gray-100 border-b">Historial Global</h4>
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cód.</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Monto</th>
+                                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historial-aportes-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Data will be loaded here -->
+                                        <tr><td colspan="3" class="text-center py-4 text-gray-500">Cargando aportes...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 3: GESTIÓN DE NOTAS -->
+                    <div id="gestion-notas" class="tab-content hidden transition duration-300 ease-in-out">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-semibold">📝 Notas (Incidencias)</h3>
+                            <button id="show-crear-nota" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow-md transition duration-300 text-sm">
+                                + Crear Nota
+                            </button>
+                        </div>
+                        <input type="text" id="search-nota" placeholder="Buscar por Código o Motivo..." class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-4">
+                        
+                        <div class="overflow-x-auto shadow-lg rounded-lg border">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cód.</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nota Motivo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solución</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notas-table-body" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data will be loaded here with color logic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO 5: REGISTRO DE GASTOS -->
+                    <div id="registro-gastos" class="tab-content hidden transition duration-300 ease-in-out">
+                        <h3 class="text-2xl font-semibold mb-4">📉 Registro de Egresos/Gastos</h3>
+                        <div class="max-w-xl p-6 bg-white rounded-lg shadow-md border">
+                            <form id="gasto-form">
+                                <div class="mb-4">
+                                    <label for="gasto-monto" class="block text-sm font-medium text-gray-700">Monto del Gasto ($)</label>
+                                    <input type="number" id="gasto-monto" step="0.01" min="0.01" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="gasto-concepto" class="block text-sm font-medium text-gray-700">Concepto/Motivo</label>
+                                    <input type="text" id="gasto-concepto" placeholder="Ej: Pago de Luz, Material Didáctico" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="gasto-beneficiario" class="block text-sm font-medium text-gray-700">Beneficiario (Persona o Empresa)</label>
+                                    <input type="text" id="gasto-beneficiario" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm">
+                                </div>
+                                <button type="submit" class="w-full py-3 px-4 rounded-lg text-white font-bold bg-red-600 hover:bg-red-700 transition duration-300 shadow-md">
+                                    Registrar Gasto
+                                </button>
+                                <p id="gasto-message" class="error-text mt-4 text-center text-red-600 font-semibold"></p>
+                            </form>
+                        </div>
+                        
+                        <h4 class="text-xl font-semibold mt-8 mb-4">Historial de Egresos</h4>
+                        <div class="overflow-x-auto shadow-lg rounded-lg border">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto ($)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Concepto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beneficiario</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="egresos-table-body" class="bg-white divide-y divide-gray-200">
+                                    <tr><td colspan="4" class="text-center py-4 text-gray-500">Cargando egresos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div> <!-- END TAB CONTENT CONTAINER -->
             </div>
         </section>
 
+        <!-- Detalle View (Padre/Profesor) -->
         <section id="detalle-view" class="view" style="display: none;">
-            <button id="back-to-dashboard">← Volver</button>
-            <h2 id="detalle-nombre">Detalle de: [Nombre]</h2>
-            <p><strong>Código:</strong> <span id="detalle-codigo"></span></p>
-            <p><strong>URL para Padre:</strong> <span id="detalle-url-padre"></span> <button onclick="copyUrl()">Copiar URL</button></p>
-            
-            <div class="summary-box">
-                <p>Deuda Pendiente: <strong id="detalle-deuda-total" class="deuda-pendiente"></strong></p>
-                <p>Meses Pendientes: <span id="detalle-meses-pendientes"></span></p>
+            <button id="back-to-dashboard" class="mb-6 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50">
+                ← Volver
+            </button>
+            <div class="bg-white p-6 rounded-xl shadow-xl">
+                <h2 id="detalle-nombre" class="text-3xl font-extrabold text-gray-900 mb-2">Detalle de: [Nombre]</h2>
+                <p class="text-gray-500 mb-6">Código: <span id="detalle-codigo" class="font-mono font-bold"></span></p>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="p-4 rounded-lg bg-red-100 border border-red-300 shadow-inner">
+                        <p class="text-sm text-red-700">Deuda Pendiente</p>
+                        <strong id="detalle-deuda-total" class="text-4xl font-extrabold text-red-600">$0.00</strong>
+                    </div>
+                    <div class="md:col-span-2 p-4 rounded-lg bg-blue-100 border border-blue-300 shadow-inner">
+                        <p class="text-sm text-blue-700 mb-1">Meses Pendientes:</p>
+                        <span id="detalle-meses-pendientes" class="block font-medium text-lg text-blue-800 break-words">Ninguno.</span>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 border-b pb-2">Historial de Pagos</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead><tr class="bg-gray-50"><th class="px-4 py-2 text-xs">Meses</th><th class="px-4 py-2 text-xs">Monto</th><th class="px-4 py-2 text-xs">Fecha</th></tr></thead>
+                                <tbody id="historial-pagos-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 border-b pb-2">Notas Creadas</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead><tr class="bg-gray-50"><th class="px-4 py-2 text-xs">ID</th><th class="px-4 py-2 text-xs">Situación</th><th class="px-4 py-2 text-xs">Estado</th></tr></thead>
+                                <tbody id="historial-notas-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <h3>Historial de Pagos</h3>
-            <table id="historial-pagos-table">
-                <thead><tr><th>ID Pago</th><th>Meses</th><th>Monto</th><th>Fecha</th></tr></thead>
-                <tbody></tbody>
-            </table>
-            
-            <h3>Notas Creadas</h3>
-            <table id="historial-notas-table">
-                <thead><tr><th>ID Nota</th><th>Situación</th><th>Estado</th><th>Solución</th></tr></thead>
-                <tbody></tbody>
-            </table>
         </section>
-        
-        <div id="nota-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span class="close-button" onclick="document.getElementById('nota-modal').style.display='none'">&times;</span>
-                <h3>Crear Nueva Nota</h3>
-                <form id="crear-nota-form">
-                    <select id="nota-participante" required>
-                        </select>
-                    <textarea id="nota-situacion" placeholder="Describa la situación/incidencia" rows="4" required></textarea>
-                    <button type="submit">Guardar Nota</button>
-                    <p id="nota-message" class="error-text"></p>
+
+
+        <!-- MODAL: Crear Participante -->
+        <div id="participante-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
+            <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg relative">
+                <button onclick="hideModal('participante-modal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+                <h3 class="text-2xl font-semibold mb-4">Crear Nuevo Participante</h3>
+                <form id="crear-participante-form">
+                    <input type="text" id="part-codigo" placeholder="Código Único" required class="w-full px-3 py-2 border rounded-lg mb-3">
+                    <input type="text" id="part-nombre" placeholder="Nombre Completo" required class="w-full px-3 py-2 border rounded-lg mb-3">
+                    <input type="text" id="part-nacionalidad" placeholder="Nacionalidad" required class="w-full px-3 py-2 border rounded-lg mb-3">
+                    
+                    <label for="part-fecha-ingreso" class="block text-sm font-medium text-gray-700 mb-1">Mes de Ingreso (Para calcular deuda)</label>
+                    <input type="month" id="part-fecha-ingreso" required class="w-full px-3 py-2 border rounded-lg mb-4">
+                    
+                    <button type="submit" class="w-full py-3 px-4 rounded-lg text-white font-bold bg-green-600 hover:bg-green-700 transition duration-300">
+                        Guardar Participante
+                    </button>
+                    <p id="participante-message" class="error-text mt-3 text-center text-red-600 font-semibold"></p>
                 </form>
             </div>
         </div>
 
-        <div id="solucion-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span class="close-button" onclick="document.getElementById('solucion-modal').style.display='none'">&times;</span>
-                <h3 id="solucion-titulo">Solucionar Nota #</h3>
-                <p>Situación: <strong id="solucion-situacion"></strong></p>
+        <!-- MODAL: Crear Nota -->
+        <div id="nota-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
+            <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg relative">
+                <button onclick="hideModal('nota-modal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+                <h3 class="text-2xl font-semibold mb-4">Crear Nueva Nota</h3>
+                <form id="crear-nota-form">
+                    <label for="nota-participante" class="block text-sm font-medium text-gray-700 mb-1">Participante</label>
+                    <select id="nota-participante" required class="w-full px-3 py-2 border rounded-lg mb-3"></select>
+                    
+                    <label for="nota-situacion" class="block text-sm font-medium text-gray-700 mb-1">Motivo / Situación</label>
+                    <textarea id="nota-situacion" placeholder="Describa el motivo de la nota..." rows="4" required class="w-full px-3 py-2 border rounded-lg mb-4"></textarea>
+                    
+                    <button type="submit" class="w-full py-3 px-4 rounded-lg text-white font-bold bg-blue-600 hover:bg-blue-700 transition duration-300">
+                        Guardar Nota
+                    </button>
+                    <p id="nota-message" class="error-text mt-3 text-center text-red-600 font-semibold"></p>
+                </form>
+            </div>
+        </div>
+        
+        <!-- MODAL: Solución Nota -->
+        <div id="solucion-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
+            <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg relative">
+                <button onclick="hideModal('solucion-modal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+                <h3 id="solucion-titulo" class="text-2xl font-semibold mb-2">Solucionar Nota #</h3>
+                <p class="mb-4 text-gray-600">Motivo: <strong id="solucion-situacion" class="text-gray-800"></strong></p>
+                
                 <form id="cerrar-nota-form">
                     <input type="hidden" id="cerrar-nota-id">
-                    <textarea id="cerrar-nota-solucion" placeholder="Describa la solución aplicada" rows="4" required></textarea>
-                    <button type="submit">Cerrar Nota</button>
-                    <p id="solucion-message" class="error-text"></p>
+                    <label for="cerrar-nota-solucion" class="block text-sm font-medium text-gray-700 mb-1">Solución Aplicada</label>
+                    <textarea id="cerrar-nota-solucion" placeholder="Describa la solución aplicada..." rows="4" required class="w-full px-3 py-2 border rounded-lg mb-4"></textarea>
+                    
+                    <button type="submit" class="w-full py-3 px-4 rounded-lg text-white font-bold bg-green-600 hover:bg-green-700 transition duration-300">
+                        Cerrar Nota
+                    </button>
+                    <p id="solucion-message" class="error-text mt-3 text-center text-red-600 font-semibold"></p>
                 </form>
             </div>
         </div>
-        
+
     </main>
 
     <script>
-        // ** Importante: Reemplaza esta URL con la URL de tu Despliegue de Apps Script **
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjpjLxF793t7qSbAak9haJkAVdoLfUy9HbauNFtEWspnDoWDqznYvslRBiB-He85El/exec'; 
+        // ** Reemplaza esta URL con la URL de tu Despliegue de Apps Script **
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjpjLxF793t7qSbAak9haJkAVdoLfUy9HbauNFtEWspnDoWDqznYvslRBiB-He85El/exec'; 
 
-let CURRENT_USER = null; // Almacenará { rol, codigo, url_id }
+        // ====================================================================
+        // ESTADO GLOBAL DE LA APLICACIÓN
+        // ====================================================================
+        let App = {
+            currentUser: null,
+            allParticipantes: [],
+            allNotas: [],
+            allAportes: [],
+            allEgresos: [],
+            view: 'login-view',
+            activeTab: 'gestion-participantes',
+            dashboardInterval: null,
+            // Precio por mes (simulación, la lógica real debe estar en Apps Script)
+            pricePerMonth: 50, // Ejemplo
+            loading: false
+        };
 
-// ====================================================================
-// UTILIDADES Y COMUNICACIÓN CON APPS SCRIPT
-// ====================================================================
+        // ====================================================================
+        // UTILIDADES Y COMUNICACIÓN CON APPS SCRIPT
+        // ====================================================================
 
-/**
- * Función para enviar peticiones POST al Apps Script.
- * @param {string} action - La acción que el backend debe ejecutar.
- * @param {object} data - Datos a enviar.
- * @returns {Promise<object>}
- */
-async function callBackend(action, data = {}) {
-    const payload = { action, data };
-    
-    try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors', // Necesario para llamadas entre dominios (GitHub Pages a Google)
-            headers: {
-                'Content-Type': 'text/plain', // Apps Script a menudo requiere 'text/plain' para el JSON
-            },
-            body: JSON.stringify(payload)
+        /**
+         * Función para enviar peticiones POST al Apps Script con manejo de errores y estado de carga.
+         */
+        async function callBackend(action, data = {}) {
+            if (App.loading) {
+                console.warn("Ya hay una solicitud en curso.");
+                return { success: false, message: 'Ya hay una solicitud en curso.' };
+            }
+            App.loading = true;
+            const payload = { 
+                action, 
+                data: {
+                    ...data,
+                    // Incluir datos de usuario para el filtrado de seguridad (Profesor)
+                    rol: App.currentUser ? App.currentUser.rol : 'Anonimo',
+                    usuarioId: App.currentUser ? App.currentUser.usuario : null
+                }
+            };
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const text = await response.text();
+                return JSON.parse(text);
+
+            } catch (error) {
+                console.error('Error al llamar al backend:', error);
+                return { success: false, message: 'Fallo de conexión con el servidor.' };
+            } finally {
+                App.loading = false;
+            }
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.style.display = 'none';
+            });
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.style.display = 'block';
+                App.view = viewId;
+            }
+            document.getElementById('logout-btn').classList.toggle('hidden', viewId === 'login-view');
+            document.getElementById('user-display').classList.toggle('hidden', viewId === 'login-view');
+        }
+
+        function setActiveTab(tabId) {
+            document.querySelectorAll('#admin-dashboard-view .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#admin-dashboard-view .tab-content').forEach(content => content.classList.add('hidden'));
+
+            const tabButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+            const tabContent = document.getElementById(tabId);
+            
+            if (tabButton) tabButton.classList.add('active');
+            if (tabContent) tabContent.classList.remove('hidden');
+
+            App.activeTab = tabId;
+
+            // Al cambiar de pestaña, refrescar la data específica si es necesario
+            if (tabId === 'gestion-finanzas') renderFinanceDashboard();
+            if (tabId === 'registro-aportes') renderHistorialAportes();
+            if (tabId === 'registro-gastos') renderEgresosTable();
+            if (tabId === 'gestion-notas') renderNotasTable(App.allNotas);
+
+            // Resetear formularios al cambiar de pestaña
+            document.getElementById('pago-form').reset();
+            document.getElementById('meses-pendientes-container').innerHTML = `<p class="col-span-full text-center text-gray-500">Busque un participante para ver los meses.</p>`;
+            document.getElementById('monto-a-pagar').textContent = '$0.00';
+        }
+
+        function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hideModal(id) { 
+            document.getElementById(id).classList.add('hidden'); 
+            // Limpiar mensajes al cerrar el modal
+            document.querySelectorAll(`#${id} .error-text`).forEach(el => el.textContent = '');
+            document.querySelectorAll(`#${id} form`).forEach(form => form.reset());
+        }
+
+        // ====================================================================
+        // VISTA DE LOGIN Y SESIÓN
+        // ====================================================================
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usuario = document.getElementById('usuario').value.trim();
+            const contrasena = document.getElementById('contrasena').value;
+            const msgEl = document.getElementById('login-message');
+            msgEl.textContent = 'Iniciando sesión...';
+
+            const result = await callBackend('LOGIN', { usuario, contrasena });
+
+            if (result.success) {
+                App.currentUser = result;
+                localStorage.setItem('currentUser', JSON.stringify(App.currentUser));
+                msgEl.textContent = 'Éxito. Redirigiendo...';
+                document.getElementById('user-display').textContent = `Usuario: ${App.currentUser.usuario} (${App.currentUser.rol})`;
+                
+                if (App.currentUser.rol === 'Administrador' || App.currentUser.rol === 'Profesor') {
+                    initAdminDashboard();
+                    showView('admin-dashboard-view');
+                    setActiveTab(App.activeTab); // Mostrar pestaña por defecto
+                } else if (App.currentUser.rol === 'Padre') {
+                    // Nota: El padre ve la vista de detalle
+                    loadDetalleParticipante(App.currentUser.codigo);
+                    showView('detalle-view');
+                }
+            } else {
+                msgEl.textContent = result.message || 'Error de autenticación.';
+                App.currentUser = null;
+            }
         });
 
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
-        }
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            clearInterval(App.dashboardInterval);
+            App.currentUser = null;
+            localStorage.removeItem('currentUser');
+            showView('login-view');
+        });
 
-        // Apps Script devuelve un Content-Type: text/html, por lo que usamos response.text()
-        const text = await response.text();
-        return JSON.parse(text);
-
-    } catch (error) {
-        console.error('Error al llamar al backend:', error);
-        return { success: false, message: 'Fallo de conexión con el servidor.' };
-    }
-}
-
-/**
- * Función para cambiar la vista en la SPA (Single Page Application).
- * @param {string} viewId - ID de la sección a mostrar (ej: 'login-view').
- */
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(view => {
-        view.style.display = 'none';
-        view.classList.remove('active');
-    });
-    const targetView = document.getElementById(viewId);
-    if (targetView) {
-        targetView.style.display = 'block';
-        targetView.classList.add('active');
-        // Limpiar mensajes de error al cambiar de vista
-        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
-    }
-    // Mostrar/ocultar botón de cerrar sesión
-    document.getElementById('logout-btn').style.display = (viewId !== 'login-view' ? 'block' : 'none');
-}
-
-// ====================================================================
-// VISTA DE LOGIN Y SESIÓN
-// ====================================================================
-
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const usuario = document.getElementById('usuario').value.trim();
-    const contrasena = document.getElementById('contrasena').value;
-    const msgEl = document.getElementById('login-message');
-    msgEl.textContent = 'Iniciando sesión...';
-
-    const result = await callBackend('LOGIN', { usuario, contrasena });
-
-    if (result.success) {
-        CURRENT_USER = result;
-        localStorage.setItem('currentUser', JSON.stringify(CURRENT_USER)); // Guardar sesión
-        msgEl.textContent = 'Éxito. Redirigiendo...';
-        
-        // Manejo de roles
-        if (CURRENT_USER.rol === 'Administrador' || CURRENT_USER.rol === 'Profesor') {
-            initAdminDashboard();
-            showView('admin-dashboard-view');
-        } else if (CURRENT_USER.rol === 'Padre') {
-            loadDetalleParticipante(CURRENT_USER.codigo);
-            showView('detalle-view');
-        }
-    } else {
-        msgEl.textContent = result.message || 'Error de autenticación.';
-        CURRENT_USER = null;
-    }
-});
-
-document.getElementById('logout-btn').addEventListener('click', () => {
-    CURRENT_USER = null;
-    localStorage.removeItem('currentUser');
-    showView('login-view');
-});
-
-// Inicialización al cargar la página (manejo de URL para padres o sesión guardada)
-window.onload = () => {
-    const params = new URLSearchParams(window.location.search);
-    const urlId = params.get('id');
-
-    if (urlId) {
-        // Lógica de URL pública para padre (simula un login de tipo "Padre")
-        CURRENT_USER = { rol: 'Padre', codigo: urlId, url_id: urlId }; // Usamos el ID como código temporal
-        loadDetalleParticipante(urlId);
-        showView('detalle-view');
-    } else {
-        // Cargar sesión guardada si existe
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            CURRENT_USER = JSON.parse(storedUser);
-            if (CURRENT_USER.rol === 'Administrador' || CURRENT_USER.rol === 'Profesor') {
-                initAdminDashboard();
-                showView('admin-dashboard-view');
-            } else if (CURRENT_USER.rol === 'Padre') {
-                loadDetalleParticipante(CURRENT_USER.codigo);
-                showView('detalle-view');
+        window.onload = () => {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                App.currentUser = JSON.parse(storedUser);
+                document.getElementById('user-display').textContent = `Usuario: ${App.currentUser.usuario} (${App.currentUser.rol})`;
+                if (App.currentUser.rol === 'Administrador' || App.currentUser.rol === 'Profesor') {
+                    initAdminDashboard();
+                    showView('admin-dashboard-view');
+                    setActiveTab(App.activeTab);
+                } else {
+                    // Si es Padre o rol desconocido, ir al login
+                    showView('login-view');
+                }
             } else {
                 showView('login-view');
             }
-        } else {
-            showView('login-view');
-        }
-    }
-};
-
-// ====================================================================
-// DASHBOARD Y GESTIÓN ADMINISTRATIVA
-// ====================================================================
-
-let dashboardInterval = null;
-let allParticipantes = []; // Cache para la búsqueda
-
-function initAdminDashboard() {
-    // 1. Cargar datos iniciales
-    loadDashboardData();
-    
-    // 2. Establecer el refresco de 5 segundos
-    if (dashboardInterval) clearInterval(dashboardInterval); // Limpia si ya existe
-    dashboardInterval = setInterval(loadDashboardData, 5000); // ** Refresco cada 5 segundos **
-
-    // 3. Manejo de pestañas
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', function() {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            this.classList.add('active');
-            document.getElementById(this.dataset.tab).classList.add('active');
-        });
-    });
-
-    // 4. Búsqueda de participantes
-    document.getElementById('search-participante').addEventListener('input', filterParticipantes);
-}
-
-// Función para el refresco asíncrono
-async function loadDashboardData() {
-    console.log('Refrescando datos del dashboard...');
-    const result = await callBackend('GET_DASHBOARD_DATA', { rol: CURRENT_USER.rol });
-
-    if (result.success) {
-        allParticipantes = result.participantes;
-        
-        // Actualizar Participantes
-        renderParticipantesTable(allParticipantes);
-        
-        // Actualizar Notas (solo si la pestaña está activa o lo necesitamos)
-        if (document.getElementById('gestion-notas').classList.contains('active')) {
-             renderNotasTable(result.notas);
-        }
-        
-        // Cargar select de crear nota
-        renderParticipanteSelect(allParticipantes);
-        
-    } else {
-        console.error('Fallo al cargar dashboard:', result.message);
-    }
-}
-
-function filterParticipantes(e) {
-    const filtro = e.target.value.toLowerCase();
-    const filtered = allParticipantes.filter(p => 
-        p.nombre.toLowerCase().includes(filtro) || 
-        p.codigo.toLowerCase().includes(filtro)
-    );
-    renderParticipantesTable(filtered);
-}
-
-// Dibuja la tabla de participantes (Admin View)
-function renderParticipantesTable(data) {
-    const tbody = document.getElementById('participantes-table').querySelector('tbody');
-    tbody.innerHTML = '';
-
-    data.forEach(p => {
-        const row = tbody.insertRow();
-        row.insertCell().textContent = p.codigo;
-        row.insertCell().textContent = p.nombre;
-        row.insertCell().textContent = `$${p.deudaTotal.toLocaleString()}`;
-        
-        const actionCell = row.insertCell();
-        const detailBtn = document.createElement('button');
-        detailBtn.textContent = 'Detalle';
-        detailBtn.onclick = () => {
-            clearInterval(dashboardInterval); // Detiene el refresco al ver detalle
-            loadDetalleParticipante(p.codigo);
-            showView('detalle-view');
         };
-        actionCell.appendChild(detailBtn);
-    });
-}
 
-// Dibuja la tabla de notas (Admin View)
-function renderNotasTable(data) {
-    const tbody = document.getElementById('notas-table').querySelector('tbody');
-    tbody.innerHTML = '';
+        // ====================================================================
+        // DASHBOARD Y CARGA DE DATOS PRINCIPAL
+        // ====================================================================
 
-    data.forEach(n => {
-        const row = tbody.insertRow();
-        row.insertCell().textContent = n.id;
-        row.insertCell().textContent = n.participante;
-        row.insertCell().textContent = n.situacion.substring(0, 50) + '...';
-        
-        const estadoCell = row.insertCell();
-        estadoCell.textContent = n.estado;
-        estadoCell.style.fontWeight = 'bold';
-        estadoCell.style.color = n.estado === 'ABIERTA' ? 'red' : 'green';
-        
-        const actionCell = row.insertCell();
-        const actionBtn = document.createElement('button');
-        actionBtn.textContent = n.estado === 'ABIERTA' ? 'Solucionar' : 'Ver Solución';
-        actionBtn.onclick = () => openSolucionModal(n);
-        actionCell.appendChild(actionBtn);
-    });
-}
+        function initAdminDashboard() {
+            // 1. Cargar datos iniciales
+            loadDashboardData();
+            
+            // 2. Establecer el refresco de 5 segundos (para la data, no la vista)
+            if (App.dashboardInterval) clearInterval(App.dashboardInterval);
+            App.dashboardInterval = setInterval(loadDashboardData, 5000); 
 
-// Carga el Select para la creación de notas
-function renderParticipanteSelect(participantes) {
-    const select = document.getElementById('nota-participante');
-    select.innerHTML = '<option value="" disabled selected>Seleccione Participante</option>';
-    participantes.forEach(p => {
-        const option = document.createElement('option');
-        option.value = p.nombre;
-        option.textContent = `${p.nombre} (${p.codigo})`;
-        select.appendChild(option);
-    });
-}
+            // 3. Manejo de pestañas
+            document.querySelectorAll('#admin-dashboard-view .tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    setActiveTab(this.dataset.tab);
+                });
+            });
 
-// ====================================================================
-// GESTIÓN DE NOTAS (Admin)
-// ====================================================================
-
-document.getElementById('show-crear-nota').addEventListener('click', () => {
-    document.getElementById('nota-modal').style.display = 'block';
-    document.getElementById('crear-nota-form').reset();
-    document.getElementById('nota-message').textContent = '';
-});
-
-document.getElementById('crear-nota-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const participante = document.getElementById('nota-participante').value;
-    const situacion = document.getElementById('nota-situacion').value;
-    const msgEl = document.getElementById('nota-message');
-    msgEl.textContent = 'Guardando nota...';
-
-    const result = await callBackend('CREAR_NOTA', { participante, situacion });
-
-    if (result.success) {
-        msgEl.textContent = result.message;
-        document.getElementById('crear-nota-form').reset();
-        loadDashboardData(); // Refresca la tabla de notas
-        setTimeout(() => {
-            document.getElementById('nota-modal').style.display = 'none';
-        }, 1500);
-    } else {
-        msgEl.textContent = result.message || 'Error al crear la nota.';
-    }
-});
-
-function openSolucionModal(nota) {
-    const modal = document.getElementById('solucion-modal');
-    document.getElementById('solucion-titulo').textContent = `Solucionar Nota #${nota.id}`;
-    document.getElementById('solucion-situacion').textContent = nota.situacion;
-    document.getElementById('cerrar-nota-id').value = nota.id;
-    document.getElementById('solucion-message').textContent = '';
-    
-    const solucionTextarea = document.getElementById('cerrar-nota-solucion');
-    
-    if (nota.estado === 'CERRADA') {
-        solucionTextarea.value = nota.solucion;
-        solucionTextarea.readOnly = true;
-        document.querySelector('#cerrar-nota-form button[type="submit"]').style.display = 'none';
-    } else {
-        solucionTextarea.value = '';
-        solucionTextarea.readOnly = false;
-        document.querySelector('#cerrar-nota-form button[type="submit"]').style.display = 'block';
-    }
-    
-    modal.style.display = 'block';
-}
-
-document.getElementById('cerrar-nota-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = parseInt(document.getElementById('cerrar-nota-id').value);
-    const solucion = document.getElementById('cerrar-nota-solucion').value;
-    const msgEl = document.getElementById('solucion-message');
-    msgEl.textContent = 'Cerrando nota...';
-
-    const result = await callBackend('CERRAR_NOTA', { id, solucion });
-
-    if (result.success) {
-        msgEl.textContent = result.message;
-        loadDashboardData(); // Refresca la tabla de notas
-        setTimeout(() => {
-            document.getElementById('solucion-modal').style.display = 'none';
-        }, 1500);
-    } else {
-        msgEl.textContent = result.message || 'Error al cerrar la nota.';
-    }
-});
-
-// ====================================================================
-// REGISTRO DE PAGOS (Admin)
-// ====================================================================
-
-// Alerta: Este es un formulario simple. La lógica avanzada de tu VBA debe manejarse en GAS.
-let mesesPendientesCache = []; // Cache de meses pendientes para la selección de pagos
-
-document.getElementById('pago-codigo').addEventListener('input', async (e) => {
-    const codigo = e.target.value.trim().toUpperCase();
-    const container = document.getElementById('meses-pendientes-container');
-    container.innerHTML = 'Buscando...';
-    document.getElementById('monto-a-pagar').textContent = '$0';
-    mesesPendientesCache = [];
-
-    if (codigo.length < 5) return;
-
-    // Llama al detalle para obtener la lista de meses pendientes
-    const result = await callBackend('GET_PARTICIPANTE_DETALLE', { codigo });
-
-    container.innerHTML = '';
-    if (result.success) {
-        mesesPendientesCache = result.resumen_pago.mesesPendientes;
-        if (mesesPendientesCache.length === 0) {
-            container.textContent = 'No hay meses pendientes de pago.';
-            return;
+            // 4. Búsqueda de participantes
+            document.getElementById('search-participante').addEventListener('input', (e) => filterAndRenderParticipantes(e.target.value));
+            // 5. Búsqueda de notas
+            document.getElementById('search-nota').addEventListener('input', (e) => filterAndRenderNotas(e.target.value));
         }
 
-        mesesPendientesCache.forEach(mes => {
-            const item = document.createElement('div');
-            item.className = 'mes-item';
-            item.dataset.mes = mes;
-            item.textContent = formatMes(mes); // Función de formato (definida abajo)
-            item.onclick = toggleMesSeleccionado;
-            container.appendChild(item);
-        });
-    } else {
-        container.textContent = 'Participante no encontrado o error.';
-    }
-});
+        async function loadDashboardData() {
+            console.log('Refrescando datos del dashboard...');
+            // Se envía el rol para que el backend filtre si es 'Profesor'
+            const result = await callBackend('GET_DASHBOARD_DATA');
 
-function formatMes(codigoMes) {
-    const anio = codigoMes.substring(0, 4);
-    const mes = codigoMes.substring(4, 6);
-    const nombres = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
-    return `${nombres[parseInt(mes) - 1]} ${anio}`;
-}
+            if (result.success) {
+                // Actualizar estado de la App
+                App.allParticipantes = result.participantes || [];
+                App.allNotas = result.notas || [];
+                App.allAportes = result.aportes || [];
+                App.allEgresos = result.egresos || [];
+                App.pricePerMonth = result.pricePerMonth || 50; // Asumir precio del backend
 
-function toggleMesSeleccionado() {
-    this.classList.toggle('selected');
-    calculateMonto();
-}
+                // Renderizar vistas que usan data global
+                filterAndRenderParticipantes(document.getElementById('search-participante').value || '');
+                renderParticipanteSelect(App.allParticipantes); // Para modals
+                renderStats(App.allParticipantes, App.allAportes);
 
-function calculateMonto() {
-    let monto = 0;
-    document.querySelectorAll('.mes-item.selected').forEach(item => {
-        const mes = item.dataset.mes;
-        // La lógica de cálculo de precios está en el Apps Script.
-        // Aquí podríamos estimar, pero para simplificar, confiamos en el backend.
-        // Usaremos un valor fijo o cachearemos el precio para cada mes para no llamar al backend
-        // For simplicity: hardcoding the value based on your rules (GAS will do the real check)
-        if (mes >= '202201' && mes <= '202406') monto += 2000;
-        else if (mes >= '202407' && mes <= '202712') monto += 3000;
-    });
-    document.getElementById('monto-a-pagar').textContent = `$${monto.toLocaleString()}`;
-}
+                // Solo renderizar tablas de pestañas activas
+                if (App.activeTab === 'gestion-notas') renderNotasTable(App.allNotas);
+                if (App.activeTab === 'registro-aportes') renderHistorialAportes();
+                if (App.activeTab === 'registro-gastos') renderEgresosTable();
 
+            } else {
+                console.error('Fallo al cargar dashboard:', result.message);
+            }
+        }
 
-document.getElementById('pago-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const codigo = document.getElementById('pago-codigo').value.trim().toUpperCase();
-    const msgEl = document.getElementById('pago-message');
-    const selectedMeses = Array.from(document.querySelectorAll('.mes-item.selected')).map(el => el.dataset.mes);
+        // ====================================================================
+        // MÓDULO: GESTIÓN DE PARTICIPANTES (RENDER & ACTIONS)
+        // ====================================================================
 
-    if (selectedMeses.length === 0) {
-        msgEl.textContent = 'Seleccione al menos un mes para registrar el pago.';
-        return;
-    }
-    
-    msgEl.textContent = 'Registrando pago...';
+        function filterAndRenderParticipantes(filtro) {
+            const f = filtro.toLowerCase();
+            const filtered = App.allParticipantes.filter(p => 
+                p.nombre.toLowerCase().includes(f) || p.codigo.toLowerCase().includes(f)
+            );
+            
+            const tbody = document.getElementById('participantes-table-body');
+            tbody.innerHTML = '';
 
-    const result = await callBackend('REGISTRAR_PAGO', { codigo, meses: selectedMeses });
-
-    if (result.success) {
-        msgEl.textContent = result.message;
-        document.getElementById('pago-form').reset();
-        document.getElementById('meses-pendientes-container').innerHTML = ''; // Limpiar meses
-        document.getElementById('monto-a-pagar').textContent = '$0';
-        loadDashboardData(); // Refresca dashboard
-    } else {
-        msgEl.textContent = result.message || 'Error al registrar el pago.';
-    }
-});
-
-// ====================================================================
-// VISTA DE DETALLE (PADRE O ADMIN)
-// ====================================================================
-
-document.getElementById('back-to-dashboard').addEventListener('click', () => {
-    if (CURRENT_USER && (CURRENT_USER.rol === 'Administrador' || CURRENT_USER.rol === 'Profesor')) {
-        initAdminDashboard();
-        showView('admin-dashboard-view');
-    } else {
-        // Si el padre está viendo por URL, no hay dashboard, solo se regresa al login
-        showView('login-view');
-    }
-});
-
-
-async function loadDetalleParticipante(codigo) {
-    const result = await callBackend('GET_PARTICIPANTE_DETALLE', { codigo });
-    showView('detalle-view');
-    
-    if (result.success) {
-        const p = result.participante;
-        const resumen = result.resumen_pago;
-
-        // Datos del participante
-        document.getElementById('detalle-nombre').textContent = `Detalle de: ${p.nombre}`;
-        document.getElementById('detalle-codigo').textContent = p.codigo;
-        
-        // URL del Padre (solo relevante si el admin la está viendo)
-        const appUrlBase = window.location.href.split('?')[0];
-        const urlPadreEl = document.getElementById('detalle-url-padre');
-        
-        if (CURRENT_USER.rol === 'Padre') {
-            document.querySelector('#detalle-url-padre').parentNode.style.display = 'none';
-        } else {
-            document.querySelector('#detalle-url-padre').parentNode.style.display = 'block';
-            urlPadreEl.textContent = `${appUrlBase}?id=${result.url_id}`;
+            filtered.forEach(p => {
+                const row = tbody.insertRow();
+                row.className = 'hover:bg-gray-50';
+                row.insertCell().textContent = p.codigo;
+                row.insertCell().textContent = p.nombre;
+                row.insertCell().textContent = p.nacionalidad;
+                row.insertCell().textContent = `$${(p.deudaTotal || 0).toLocaleString()}`;
+                
+                const actionCell = row.insertCell();
+                actionCell.className = 'flex space-x-2 py-4';
+                const detailBtn = document.createElement('button');
+                detailBtn.textContent = 'Detalle';
+                detailBtn.className = 'bg-blue-500 hover:bg-blue-600 text-white text-xs py-1 px-2 rounded-md transition duration-300';
+                detailBtn.onclick = () => {
+                    clearInterval(App.dashboardInterval); 
+                    loadDetalleParticipante(p.codigo);
+                };
+                actionCell.appendChild(detailBtn);
+            });
         }
         
-        // Resumen
-        document.getElementById('detalle-deuda-total').textContent = `$${resumen.deudaTotal.toLocaleString()}`;
-        document.getElementById('detalle-meses-pendientes').textContent = resumen.mesesPendientes.map(formatMes).join(' | ') || 'Ninguno.';
+        function renderStats(participantes, aportes) {
+            document.getElementById('stat-total').textContent = participantes.length;
 
-        // Historial de Pagos
-        const pagosTbody = document.getElementById('historial-pagos-table').querySelector('tbody');
-        pagosTbody.innerHTML = '';
-        result.pagos.forEach(pago => {
-            const row = pagosTbody.insertRow();
-            row.insertCell().textContent = pago.id;
-            row.insertCell().textContent = pago.meses.split(', ').map(formatMes).join(', ');
-            row.insertCell().textContent = `$${pago.monto.toLocaleString()}`;
-            row.insertCell().textContent = pago.fecha;
+            if (participantes.length === 0) return;
+
+            // 1. Estadísticas de Nacionalidad
+            const nacionalidadMap = participantes.reduce((acc, p) => {
+                acc[p.nacionalidad] = (acc[p.nacionalidad] || 0) + 1;
+                return acc;
+            }, {});
+            const nacionalidadUl = document.getElementById('stat-nacionalidad');
+            nacionalidadUl.innerHTML = '';
+            Object.entries(nacionalidadMap).forEach(([pais, count]) => {
+                const li = document.createElement('li');
+                li.textContent = `${pais}: ${count}`;
+                nacionalidadUl.appendChild(li);
+            });
+
+            // 2. Total Aportado
+            const totalAportado = aportes.reduce((sum, a) => sum + (a.monto || 0), 0);
+            document.getElementById('stat-aportado').textContent = `$${totalAportado.toLocaleString('es-CO', { minimumFractionDigits: 2 })}`;
+
+            // 3. Frecuencia Media (Simulación simple: pagos totales / participantes)
+            const totalPagos = aportes.length;
+            const freqMedia = (totalPagos / participantes.length).toFixed(2);
+            document.getElementById('stat-frecuencia').textContent = totalPagos === 0 ? 'N/A' : `${freqMedia} pagos/participante`;
+        }
+
+        // Abrir Modal Crear Participante
+        document.getElementById('show-crear-participante').addEventListener('click', () => {
+            showModal('participante-modal');
         });
 
-        // Notas Creadas
-        const notasTbody = document.getElementById('historial-notas-table').querySelector('tbody');
-        notasTbody.innerHTML = '';
-        result.notas.forEach(nota => {
-            const row = notasTbody.insertRow();
-            row.insertCell().textContent = nota.id;
-            row.insertCell().textContent = nota.situacion;
-            const estadoCell = row.insertCell();
-            estadoCell.textContent = nota.estado;
-            estadoCell.style.color = nota.estado === 'ABIERTA' ? 'red' : 'green';
-            row.insertCell().textContent = nota.solucion || 'Pendiente';
+        // Crear Participante Form Submission
+        document.getElementById('crear-participante-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const codigo = document.getElementById('part-codigo').value.trim().toUpperCase();
+            const nombre = document.getElementById('part-nombre').value.trim();
+            const nacionalidad = document.getElementById('part-nacionalidad').value.trim();
+            const fechaIngreso = document.getElementById('part-fecha-ingreso').value; // YYYY-MM
+            const msgEl = document.getElementById('participante-message');
+            msgEl.textContent = 'Guardando participante...';
+
+            const result = await callBackend('CREAR_PARTICIPANTE', { codigo, nombre, nacionalidad, fechaIngreso });
+
+            if (result.success) {
+                msgEl.textContent = 'Participante creado con éxito.';
+                hideModal('participante-modal');
+                loadDashboardData();
+            } else {
+                msgEl.textContent = result.message || 'Error al crear el participante.';
+            }
         });
 
-    } else {
-        alert(result.message);
-        showView('admin-dashboard-view');
-    }
-}
+        // ====================================================================
+        // MÓDULO: REGISTRO DE APORTES (RENDER & ACTIONS)
+        // ====================================================================
+        let selectedParticipante = null;
 
-function copyUrl() {
-    const urlText = document.getElementById('detalle-url-padre').textContent;
-    navigator.clipboard.writeText(urlText).then(() => {
-        alert('URL copiada al portapapeles.');
-    }, (err) => {
-        alert('Error al copiar URL.');
-    });
-}
+        // Búsqueda en el módulo de pagos
+        document.getElementById('pago-codigo-busqueda').addEventListener('input', async (e) => {
+            const input = e.target.value.trim().toUpperCase();
+            const infoContainer = document.getElementById('participante-info-pago');
+            const mesesContainer = document.getElementById('meses-pendientes-container');
+            mesesContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">Buscando...</p>`;
+            document.getElementById('monto-a-pagar').textContent = '$0.00';
+            infoContainer.classList.add('hidden');
+            selectedParticipante = null;
+
+            if (input.length < 3) return;
+
+            const participante = App.allParticipantes.find(p => p.codigo === input || p.nombre.toUpperCase().includes(input));
+            
+            if (participante) {
+                const result = await callBackend('GET_PARTICIPANTE_DETALLE', { codigo: participante.codigo });
+                
+                if (result.success) {
+                    selectedParticipante = {
+                        codigo: participante.codigo,
+                        nombre: participante.nombre,
+                        mesesPendientes: result.resumen_pago.mesesPendientes,
+                        historialPagos: result.pagos
+                    };
+                    renderMesesDeuda(result.meses); // Meses incluye pagados, pendientes y con 'X'
+                    document.getElementById('pago-participante-nombre').textContent = participante.nombre;
+                    document.getElementById('pago-participante-codigo').textContent = participante.codigo;
+                    infoContainer.classList.remove('hidden');
+                } else {
+                    mesesContainer.innerHTML = `<p class="col-span-full text-center text-red-500">Error: ${result.message}</p>`;
+                }
+
+            } else {
+                mesesContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">Participante no encontrado.</p>`;
+            }
+        });
+        
+        // Función de formato (YYYYMM a Mes YYYY)
+        function formatMes(codigoMes) {
+            const anio = codigoMes.substring(0, 4);
+            const mes = codigoMes.substring(4, 6);
+            const nombres = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+            return `${nombres[parseInt(mes) - 1]} ${anio}`;
+        }
+
+        function renderMesesDeuda(mesesData) {
+            const container = document.getElementById('meses-pendientes-container');
+            container.innerHTML = '';
+            if (mesesData.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-green-500 font-bold">Participante al día.</p>`;
+                return;
+            }
+
+            mesesData.forEach(m => {
+                const { mes, estado, debePagar, monto } = m;
+                const mesId = `mes-${mes}`;
+                
+                // Color y estado inicial
+                let bgColor = '';
+                let isDisabled = false;
+                let isChecked = false;
+                let labelText = formatMes(mes);
+                
+                if (estado === 'PAGADO') {
+                    bgColor = 'bg-green-300';
+                    isDisabled = true;
+                    isChecked = true;
+                    labelText += ' (PAGADO)';
+                } else if (estado === 'DEBE') {
+                    bgColor = 'bg-red-300 hover:bg-red-400';
+                    labelText += ` ($${monto})`;
+                } else if (estado === 'X') {
+                    bgColor = 'bg-gray-200';
+                    isDisabled = true;
+                    labelText += ' (X Ingreso)';
+                }
+
+                const div = document.createElement('div');
+                div.className = `p-2 rounded-lg text-center text-xs font-semibold shadow-inner ${bgColor} ${isDisabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`;
+                
+                div.innerHTML = `
+                    <input type="checkbox" id="${mesId}" data-mes="${mes}" data-monto="${monto}" ${isDisabled ? 'disabled' : ''} ${isChecked ? 'checked' : ''} class="mr-1 rounded text-blue-600 focus:ring-blue-500 h-4 w-4">
+                    <label for="${mesId}" class="block text-sm font-medium text-gray-900">${labelText}</label>
+                `;
+                
+                // Solo adjuntar listener si no está deshabilitado
+                if (!isDisabled) {
+                    div.querySelector('input[type="checkbox"]').addEventListener('change', calculateMontoAporte);
+                }
+
+                container.appendChild(div);
+            });
+            calculateMontoAporte(); // Calcular por si ya vienen meses chequeados
+        }
+
+        function calculateMontoAporte() {
+            let total = 0;
+            document.querySelectorAll('#meses-pendientes-container input[type="checkbox"]:checked:not([disabled])').forEach(input => {
+                total += parseFloat(input.dataset.monto);
+            });
+            document.getElementById('monto-a-pagar').textContent = `$${total.toLocaleString('es-CO', { minimumFractionDigits: 2 })}`;
+        }
+
+        document.getElementById('pago-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById('pago-message');
+            
+            if (!selectedParticipante) {
+                msgEl.textContent = 'Primero debe seleccionar un participante.';
+                return;
+            }
+
+            const selectedMeses = Array.from(document.querySelectorAll('#meses-pendientes-container input[type="checkbox"]:checked:not([disabled])'))
+                                    .map(el => el.dataset.mes);
+            
+            const monto = Array.from(document.querySelectorAll('#meses-pendientes-container input[type="checkbox"]:checked:not([disabled])'))
+                          .reduce((sum, el) => sum + parseFloat(el.dataset.monto), 0);
+
+            if (selectedMeses.length === 0) {
+                msgEl.textContent = 'Seleccione al menos un mes para registrar el pago.';
+                return;
+            }
+            
+            msgEl.textContent = 'Registrando pago...';
+
+            const result = await callBackend('REGISTRAR_PAGO', { 
+                codigo: selectedParticipante.codigo, 
+                meses: selectedMeses, 
+                montoTotal: monto 
+            });
+
+            if (result.success) {
+                msgEl.textContent = result.message;
+                // Simular el input para recargar la lista de meses del participante
+                document.getElementById('pago-codigo-busqueda').dispatchEvent(new Event('input')); 
+                loadDashboardData(); // Refresca historial global y stats
+            } else {
+                msgEl.textContent = result.message || 'Error al registrar el pago.';
+            }
+        });
+
+        function renderHistorialAportes() {
+            const tbody = document.getElementById('historial-aportes-body');
+            tbody.innerHTML = '';
+            
+            App.allAportes
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha)) // Ordenar por fecha descendente
+                .slice(0, 15) // Mostrar solo los últimos 15
+                .forEach(a => {
+                const row = tbody.insertRow();
+                row.insertCell().textContent = a.codigo;
+                row.insertCell().textContent = `$${(a.monto || 0).toLocaleString()}`;
+                row.insertCell().textContent = a.fecha;
+            });
+            if (App.allAportes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-500">No hay aportes registrados.</td></tr>`;
+            }
+        }
+
+        // ====================================================================
+        // MÓDULO: GESTIÓN DE NOTAS (RENDER & ACTIONS)
+        // ====================================================================
+
+        function filterAndRenderNotas(filtro) {
+            const f = filtro.toLowerCase();
+            const filtered = App.allNotas.filter(n => 
+                n.codigo.toLowerCase().includes(f) || n.motivo.toLowerCase().includes(f)
+            );
+            renderNotasTable(filtered);
+        }
+
+        function renderNotasTable(data) {
+            const tbody = document.getElementById('notas-table-body');
+            tbody.innerHTML = '';
+            const today = new Date();
+
+            data.forEach(n => {
+                const row = tbody.insertRow();
+                const fechaCreacion = new Date(n.fechaCreacion);
+                const diffDays = Math.ceil((today - fechaCreacion) / (1000 * 60 * 60 * 24));
+
+                let bgColor = 'bg-white';
+                
+                if (n.estado === 'CERRADA') {
+                    bgColor = 'bg-green-light'; // Verde claro
+                } else if (diffDays > 10) {
+                    bgColor = 'bg-yellow-light'; // Amarillo claro (Alerta: quedan 5 días)
+                } else if (diffDays <= 15) {
+                    bgColor = 'bg-red-light'; // Rojo claro (Nuevo, 15 días para responder)
+                }
+
+                row.className = bgColor;
+                row.insertCell().textContent = n.codigo;
+                row.insertCell().textContent = n.motivo.substring(0, 70) + '...';
+                row.insertCell().textContent = n.solucion || ''; // Solución en blanco si no se ha respondido
+                
+                const estadoCell = row.insertCell();
+                estadoCell.textContent = n.estado;
+                estadoCell.className = `font-bold text-xs ${n.estado === 'CERRADA' ? 'text-green-700' : 'text-red-700'}`;
+
+                const actionCell = row.insertCell();
+                actionCell.className = 'flex space-x-2 py-3';
+                
+                const editBtn = createActionButton('Editar', 'bg-yellow-500 hover:bg-yellow-600', () => openNotaModal(n));
+                const deleteBtn = createActionButton('Eliminar', 'bg-red-500 hover:bg-red-600', () => deleteNota(n.id));
+                actionCell.appendChild(editBtn);
+                actionCell.appendChild(deleteBtn);
+
+                if (n.estado === 'ABIERTA') {
+                    const solveBtn = createActionButton('Solución', 'bg-blue-500 hover:bg-blue-600', () => openSolucionModal(n));
+                    actionCell.appendChild(solveBtn);
+                }
+            });
+        }
+
+        function createActionButton(text, colorClass, handler) {
+            const btn = document.createElement('button');
+            btn.textContent = text;
+            btn.className = `${colorClass} text-white text-xs py-1 px-2 rounded-md transition duration-300 shadow-sm`;
+            btn.onclick = handler;
+            return btn;
+        }
+        
+        function deleteNota(id) {
+            if (!confirm('¿Está seguro de que desea eliminar esta nota?')) return;
+            // Lógica de eliminación...
+            callBackend('DELETE_NOTA', { id }).then(result => {
+                if (result.success) {
+                    loadDashboardData();
+                } else {
+                    alert(result.message);
+                }
+            });
+        }
+
+        document.getElementById('show-crear-nota').addEventListener('click', () => {
+            showModal('nota-modal');
+            document.getElementById('nota-message').textContent = '';
+        });
+
+        function openNotaModal(nota = null) {
+            const form = document.getElementById('crear-nota-form');
+            form.reset();
+            document.getElementById('nota-message').textContent = '';
+            
+            if (nota) {
+                // Modo Edición (simulado, pero la acción es 'EDITAR_NOTA' en backend)
+                document.getElementById('nota-participante').value = nota.participante;
+                document.getElementById('nota-situacion').value = nota.motivo;
+                document.getElementById('nota-participante').setAttribute('disabled', 'true');
+                form.dataset.notaId = nota.id;
+            } else {
+                // Modo Creación
+                document.getElementById('nota-participante').removeAttribute('disabled');
+                form.dataset.notaId = '';
+            }
+            showModal('nota-modal');
+        }
+
+        function openSolucionModal(nota) {
+            const modal = document.getElementById('solucion-modal');
+            const form = document.getElementById('cerrar-nota-form');
+            form.reset();
+            document.getElementById('solucion-message').textContent = '';
+            
+            document.getElementById('solucion-titulo').textContent = `Solucionar Nota #${nota.id}`;
+            document.getElementById('solucion-situacion').textContent = nota.motivo;
+            document.getElementById('cerrar-nota-id').value = nota.id;
+            
+            const solucionTextarea = document.getElementById('cerrar-nota-solucion');
+            const submitBtn = document.querySelector('#cerrar-nota-form button[type="submit"]');
+
+            if (nota.estado === 'CERRADA') {
+                solucionTextarea.value = nota.solucion;
+                solucionTextarea.setAttribute('readonly', 'true');
+                submitBtn.classList.add('hidden');
+            } else {
+                solucionTextarea.value = '';
+                solucionTextarea.removeAttribute('readonly');
+                submitBtn.classList.remove('hidden');
+            }
+            
+            showModal('solucion-modal');
+        }
+
+        document.getElementById('crear-nota-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const participante = document.getElementById('nota-participante').value;
+            const situacion = document.getElementById('nota-situacion').value;
+            const msgEl = document.getElementById('nota-message');
+            const action = e.target.dataset.notaId ? 'EDITAR_NOTA' : 'CREAR_NOTA';
+            const data = { id: e.target.dataset.notaId, participante, situacion };
+            msgEl.textContent = 'Procesando nota...';
+
+            const result = await callBackend(action, data);
+
+            if (result.success) {
+                msgEl.textContent = result.message;
+                hideModal('nota-modal');
+                loadDashboardData(); 
+            } else {
+                msgEl.textContent = result.message || 'Error al procesar la nota.';
+            }
+        });
+
+        document.getElementById('cerrar-nota-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('cerrar-nota-id').value);
+            const solucion = document.getElementById('cerrar-nota-solucion').value;
+            const msgEl = document.getElementById('solucion-message');
+            msgEl.textContent = 'Cerrando nota...';
+
+            const result = await callBackend('CERRAR_NOTA', { id, solucion });
+
+            if (result.success) {
+                msgEl.textContent = result.message;
+                loadDashboardData();
+                setTimeout(() => { hideModal('solucion-modal'); }, 1000);
+            } else {
+                msgEl.textContent = result.message || 'Error al cerrar la nota.';
+            }
+        });
+
+        // Carga el Select para la creación de notas
+        function renderParticipanteSelect(participantes) {
+            const select = document.getElementById('nota-participante');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="" disabled selected>Seleccione Participante</option>';
+            participantes.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.nombre;
+                option.textContent = `${p.nombre} (${p.codigo})`;
+                select.appendChild(option);
+            });
+            // Mantener el valor seleccionado si existe
+            if (currentValue) select.value = currentValue;
+        }
+
+        // ====================================================================
+        // MÓDULO: DASHBOARD DE DINERO (CHARTS)
+        // ====================================================================
+
+        function renderFinanceDashboard() {
+            // Lógica para poblar los selects de años y meses
+            const yearSelect = document.getElementById('filter-year');
+            const monthSelect = document.getElementById('filter-month');
+            const currentYear = new Date().getFullYear();
+            
+            // Populating Years (2022 to current year + 1)
+            yearSelect.innerHTML = '<option value="">Todos los Años</option>';
+            for (let y = 2022; y <= currentYear + 1; y++) {
+                yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+
+            // Populating Months
+            monthSelect.innerHTML = '<option value="">Todos los Meses</option>';
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            monthNames.forEach((name, index) => {
+                const monthNum = String(index + 1).padStart(2, '0');
+                monthSelect.innerHTML += `<option value="${monthNum}">${name}</option>`;
+            });
+
+            // Simulación de datos para los gráficos
+            const data = [
+                { month: "Ene", aportes: 1200, gastos: 400, concepto: "Alquiler" },
+                { month: "Feb", aportes: 1500, gastos: 600, concepto: "Sueldos" },
+                { month: "Mar", aportes: 1800, gastos: 500, concepto: "Materiales" },
+                // Aquí iría la lógica real de filtrado sobre App.allAportes y App.allEgresos
+            ];
+
+            // Renderizado de gráficos
+            renderBarChart(data);
+            renderPieChart(data);
+        }
+
+        // D3.js Bar Chart Simulation
+        function renderBarChart(data) {
+            const containerId = "chart-bar-container";
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (data.length === 0) {
+                container.textContent = 'No hay datos para el período seleccionado.';
+                return;
+            }
+
+            const margin = {top: 20, right: 20, bottom: 30, left: 40},
+                width = container.offsetWidth - margin.left - margin.right,
+                height = 250 - margin.top - margin.bottom;
+
+            const svg = d3.select("#" + containerId)
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            const x = d3.scaleBand()
+                .range([0, width])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .range([height, 0]);
+
+            x.domain(data.map(d => d.month));
+            y.domain([0, d3.max(data, d => Math.max(d.aportes, d.gastos))]);
+
+            // Barras de Aportes
+            svg.selectAll(".bar-aportes")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar-aportes")
+                .attr("x", d => x(d.month))
+                .attr("width", x.bandwidth() / 2)
+                .attr("y", d => y(d.aportes))
+                .attr("height", d => height - y(d.aportes))
+                .attr("fill", "#3b82f6");
+
+            // Barras de Gastos
+            svg.selectAll(".bar-gastos")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar-gastos")
+                .attr("x", d => x(d.month) + x.bandwidth() / 2)
+                .attr("width", x.bandwidth() / 2)
+                .attr("y", d => y(d.gastos))
+                .attr("height", d => height - y(d.gastos))
+                .attr("fill", "#ef4444");
+
+            // Eje X
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            // Eje Y
+            svg.append("g")
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format("$.0f")));
+        }
+        
+        // D3.js Pie Chart Simulation
+        function renderPieChart(data) {
+            const containerId = "chart-pie-container";
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const pieData = data.map(d => ({ concept: d.concepto, value: d.gastos }));
+            const totalGastos = pieData.reduce((sum, d) => sum + d.value, 0);
+
+            if (totalGastos === 0) {
+                container.textContent = 'No hay datos de gastos para este período.';
+                return;
+            }
+
+            const width = 250, height = 250, radius = Math.min(width, height) / 2;
+
+            const svg = d3.select("#" + containerId)
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", `translate(${width / 2},${height / 2})`);
+
+            const color = d3.scaleOrdinal(d3.schemeCategory10);
+            
+            const pie = d3.pie()
+                .sort(null)
+                .value(d => d.value);
+
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius * 0.8);
+
+            const arcs = svg.selectAll(".arc")
+                .data(pie(pieData))
+                .enter().append("g")
+                .attr("class", "arc");
+
+            arcs.append("path")
+                .attr("d", arc)
+                .attr("fill", d => color(d.data.concept));
+
+            // Agregar texto de etiquetas (simulación simple, solo en el centro)
+            arcs.append("text")
+                .attr("transform", d => `translate(${arc.centroid(d)})`)
+                .attr("dy", "0.35em")
+                .style("text-anchor", "middle")
+                .style("font-size", "10px")
+                .text(d => `${d.data.concept} (${(d.data.value / totalGastos * 100).toFixed(1)}%)`);
+        }
+
+        function updateFinanceDashboard() {
+            // Esta función llama al backend con los filtros seleccionados
+            // y luego vuelve a llamar a renderBarChart/renderPieChart con la data filtrada.
+            const year = document.getElementById('filter-year').value;
+            const month = document.getElementById('filter-month').value;
+            
+            console.log(`Filtrando datos para: ${month}-${year}`);
+            // callBackend('GET_FINANCE_DATA', { year, month }).then(result => { ... });
+            
+            // Por ahora, solo simulación:
+            renderFinanceDashboard(); 
+        }
+
+        // ====================================================================
+        // MÓDULO: REGISTRO DE GASTOS (ACTIONS)
+        // ====================================================================
+
+        document.getElementById('gasto-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const monto = parseFloat(document.getElementById('gasto-monto').value);
+            const concepto = document.getElementById('gasto-concepto').value.trim();
+            const beneficiario = document.getElementById('gasto-beneficiario').value.trim();
+            const msgEl = document.getElementById('gasto-message');
+            msgEl.textContent = 'Registrando gasto...';
+
+            const result = await callBackend('REGISTRAR_GASTO', { monto, concepto, beneficiario });
+
+            if (result.success) {
+                msgEl.textContent = 'Gasto registrado con éxito.';
+                document.getElementById('gasto-form').reset();
+                loadDashboardData(); 
+            } else {
+                msgEl.textContent = result.message || 'Error al registrar el gasto.';
+            }
+        });
+
+        function renderEgresosTable() {
+            const tbody = document.getElementById('egresos-table-body');
+            tbody.innerHTML = '';
+            
+            App.allEgresos
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                .forEach(e => {
+                const row = tbody.insertRow();
+                row.insertCell().textContent = `$${(e.monto || 0).toLocaleString()}`;
+                row.insertCell().textContent = e.concepto;
+                row.insertCell().textContent = e.beneficiario;
+                row.insertCell().textContent = e.fecha;
+            });
+            if (App.allEgresos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">No hay egresos registrados.</td></tr>`;
+            }
+        }
+
+        // ====================================================================
+        // VISTA DE DETALLE (PADRE O ADMIN)
+        // ====================================================================
+
+        document.getElementById('back-to-dashboard').addEventListener('click', () => {
+            if (App.currentUser && (App.currentUser.rol === 'Administrador' || App.currentUser.rol === 'Profesor')) {
+                // Si vuelve al dashboard, reiniciar el intervalo de refresco
+                initAdminDashboard(); 
+                showView('admin-dashboard-view');
+            } else {
+                showView('login-view');
+            }
+        });
+
+
+        async function loadDetalleParticipante(codigo) {
+            const result = await callBackend('GET_PARTICIPANTE_DETALLE', { codigo });
+            showView('detalle-view');
+            
+            if (result.success) {
+                const p = result.participante;
+                const resumen = result.resumen_pago;
+
+                document.getElementById('detalle-nombre').textContent = `Detalle de: ${p.nombre}`;
+                document.getElementById('detalle-codigo').textContent = p.codigo;
+                
+                document.getElementById('detalle-deuda-total').textContent = `$${(resumen.deudaTotal || 0).toLocaleString('es-CO', { minimumFractionDigits: 2 })}`;
+                document.getElementById('detalle-meses-pendientes').textContent = resumen.mesesPendientes.map(formatMes).join(' | ') || 'Ninguno.';
+
+                // Historial de Pagos
+                const pagosTbody = document.getElementById('historial-pagos-table-body');
+                pagosTbody.innerHTML = '';
+                result.pagos.forEach(pago => {
+                    const row = pagosTbody.insertRow();
+                    row.insertCell().textContent = pago.meses.split(', ').map(formatMes).join(', ');
+                    row.insertCell().textContent = `$${(pago.monto || 0).toLocaleString()}`;
+                    row.insertCell().textContent = pago.fecha;
+                });
+
+                // Notas Creadas
+                const notasTbody = document.getElementById('historial-notas-table-body');
+                notasTbody.innerHTML = '';
+                result.notas.forEach(nota => {
+                    const row = notasTbody.insertRow();
+                    row.insertCell().textContent = nota.id;
+                    row.insertCell().textContent = nota.motivo.substring(0, 50) + '...';
+                    const estadoCell = row.insertCell();
+                    estadoCell.textContent = nota.estado;
+                    estadoCell.className = `font-bold text-xs ${nota.estado === 'CERRADA' ? 'text-green-700' : 'text-red-700'}`;
+                });
+
+            } else {
+                // Usar un div de mensaje en lugar de alert
+                console.error(result.message);
+                showView('admin-dashboard-view');
+            }
+        }
     </script>
 </body>
 </html>
