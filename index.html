@@ -1,1144 +1,839 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestión de Aportes | ICC</title>
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Académica - Pagos y Notas</title>
     <style>
-        /* ========================================================= */
-        /* CSS STYLES - DISEÑO PROFESIONAL Y RESPONSIVO */
-        /* ========================================================= */
+        /* Estilos Básicos */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
 
-        :root {
-            --color-primario: #0891b2;
-            /* Cyan 700 */
-            --color-primario-dark: #0e7490;
-            /* Cyan 800 */
-            --color-secundario: #10b981;
-            /* Emerald 500 (Éxito) */
-            --color-error: #ef4444;
-            /* Red 500 */
-            --color-fondo: #f0f9ff;
-            /* Fondo muy claro */
-            --color-card: #ffffff;
-            --color-texto: #333333;
-            --color-borde: #e2e8f0;
-        }
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--color-fondo);
-            color: var(--color-texto);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
-        /* --- Estructura Global --- */
-        #login-view {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: var(--color-primario-dark);
-        }
+.view {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
 
-        #app-container {
-            display: none;
-            grid-template-columns: 250px 1fr;
-            min-height: 100vh;
-        }
+/* Formularios y Entradas */
+form input[type="text"], 
+form input[type="password"], 
+form select,
+form textarea,
+#search-participante {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 16px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
 
-        /* --- Navegación Lateral (Sidebar) --- */
-        #sidebar {
-            background-color: var(--color-primario);
-            color: white;
-            padding: 20px 0;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
 
-        #sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 700;
-        }
+button:hover {
+    background-color: #0056b3;
+}
 
-        .nav-item {
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-        }
+.error-text {
+    color: red;
+    font-weight: bold;
+}
 
-        .nav-item i {
-            margin-right: 10px;
-            font-size: 1.1em;
-        }
+/* Tabs */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+}
 
-        .nav-item:hover,
-        .nav-item.active {
-            background-color: var(--color-primario-dark);
-            border-left: 5px solid var(--color-secundario);
-            padding-left: 15px;
-        }
+.tab-button {
+    background-color: #f1f1f1;
+    color: #333;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+    transition: background-color 0.3s;
+}
 
-        #logout {
-            position: absolute;
-            bottom: 20px;
-            width: 250px;
-            text-align: center;
-            color: #ffcccc;
-        }
+.tab-button.active {
+    background-color: white;
+    border: 2px solid #ddd;
+    border-bottom: 2px solid white;
+}
 
-        /* --- Contenido Principal (Main Content) --- */
-        #main-content {
-            padding: 30px;
-            overflow-y: auto;
-        }
+.tab-content {
+    padding: 10px 0;
+}
 
-        .module-view {
-            display: none;
-        }
+/* Tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
 
-        .module-view.active {
-            display: block;
-        }
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
 
-        /* --- Tarjetas y Diseño --- */
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
 
-        .card {
-            background-color: var(--color-card);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            transition: transform 0.3s;
-        }
+.deuda-pendiente {
+    color: #dc3545;
+    font-size: 1.2em;
+}
 
-        .card:hover {
-            transform: translateY(-3px);
-        }
+/* Responsividad */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .view {
+        padding: 10px;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab-button {
+        width: 100%;
+        margin-bottom: 5px;
+    }
 
-        .card h3 {
-            color: var(--color-primario-dark);
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
+    /* Ocultar algunas columnas en móviles */
+    #participantes-table th:nth-child(3), 
+    #participantes-table td:nth-child(3) {
+        display: none; 
+    }
+}
 
-        .card .value {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--color-secundario);
-        }
+/* Estilos de Meses (para el formulario de pago) */
+#meses-pendientes-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
 
-        .card-info {
-            padding: 15px;
-            background-color: var(--color-fondo);
-            border-radius: 4px;
-            border-left: 4px solid var(--color-primario);
-            margin-top: 15px;
-        }
+.mes-item {
+    padding: 5px 10px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    background-color: #e9f7ff;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, border-color 0.2s;
+}
 
-        /* --- Tablas --- */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 0.9em;
-        }
+.mes-item.selected {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
 
-        th,
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--color-borde);
-            text-align: left;
-        }
+/* Estilos de Modales */
+.modal {
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); 
+}
 
-        th {
-            background-color: var(--color-primario-dark);
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    max-width: 500px;
+    border-radius: 8px;
+    position: relative;
+}
 
-        tbody tr:hover {
-            background-color: #f0f0f0;
-        }
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
 
-        .tag-activo {
-            color: #16a34a;
-            font-weight: 600;
-        }
-
-        .tag-inactivo {
-            color: var(--color-error);
-            font-weight: 600;
-        }
-
-        .btn-url {
-            background-color: var(--color-secundario);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn-url:hover {
-            background-color: #059669;
-        }
-
-        /* --- Formularios y Controles --- */
-        .controls {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select {
-            padding: 10px;
-            border: 1px solid var(--color-borde);
-            border-radius: 6px;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-
-        .btn-primary {
-            background-color: var(--color-primario);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-primario-dark);
-        }
-
-        .btn-secondary {
-            background-color: #94a3b8;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #64748b;
-        }
-
-        /* --- Modal (Registro de Aportes) --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s, opacity 0.3s;
-        }
-
-        .modal-overlay.visible {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .modal-content {
-            background-color: var(--color-card);
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: var(--color-error);
-        }
-
-        .meses-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .mes-item {
-            padding: 10px;
-            border: 1px solid var(--color-borde);
-            border-radius: 4px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-            font-size: 0.85em;
-        }
-
-        .mes-pagado {
-            background-color: #d1fae5;
-            color: #065f46;
-            border-color: #10b981;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .mes-seleccionado {
-            background-color: var(--color-primario);
-            color: white;
-            border-color: var(--color-primario-dark);
-        }
-
-        .mes-deuda {
-            background-color: #fee2e2;
-            color: var(--color-error);
-            border-color: var(--color-error);
-        }
-
-        /* --- Responsive Design (Mobile First) --- */
-        @media (max-width: 768px) {
-            #app-container {
-                grid-template-columns: 1fr;
-            }
-
-            #sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 10px 0;
-            }
-
-            #sidebar h2 {
-                display: none;
-            }
-
-            .nav-item {
-                display: inline-flex;
-                width: 33.33%;
-                text-align: center;
-                justify-content: center;
-                padding: 10px 5px;
-                border-left: none !important;
-            }
-
-            .nav-item span {
-                display: none;
-            }
-
-            .nav-item i {
-                margin-right: 0;
-            }
-
-            #logout {
-                display: none;
-            }
-
-            #main-content {
-                padding: 15px;
-            }
-
-            .meses-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
     </style>
 </head>
-
 <body>
-
-    <div id="login-view">
-        <div class="card" style="max-width: 400px; text-align: center;">
-            <h2>Bienvenido | ICC</h2>
+    <header>
+        <h1>Sistema de Gestión</h1>
+        <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
+    </header>
+    
+    <main id="app-container">
+        <section id="login-view" class="view active">
+            <h2>Acceso al Sistema</h2>
             <form id="login-form">
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="username" placeholder="Usuario" required style="max-width: 100%;" />
-                </div>
-                <div style="margin-bottom: 25px;">
-                    <input type="password" id="password" placeholder="Contraseña" required style="max-width: 100%;" />
-                </div>
-                <button type="submit" class="btn-primary" id="login-btn" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                </button>
-                <p id="login-message" style="color: var(--color-error); margin-top: 15px;"></p>
+                <input type="text" id="usuario" placeholder="Usuario/Código" required>
+                <input type="password" id="contrasena" placeholder="Contraseña" required>
+                <button type="submit">Ingresar</button>
+                <p id="login-message" class="error-text"></p>
             </form>
-        </div>
-    </div>
+        </section>
 
-    <div id="app-container">
-
-        <aside id="sidebar">
-            <h2>ICC Gestor</h2>
-            <div id="nav-list">
-                <div class="nav-item active" data-module="dashboard" data-roles="ADMIN,TUTORA">
-                    <i class="fas fa-chart-line"></i> <span>Dashboard</span>
-                </div>
-                <div class="nav-item" data-module="participantes-aportes" data-roles="ADMIN,TUTORA">
-                    <i class="fas fa-users"></i> <span>Participantes</span>
-                </div>
-                <div class="nav-item" data-module="registro-actividad" data-roles="ADMIN">
-                    <i class="fas fa-history"></i> <span>Actividad</span>
-                </div>
+        <section id="admin-dashboard-view" class="view" style="display: none;">
+            <h2>Dashboard Administrativo 📊</h2>
+            <nav class="tabs">
+                <button class="tab-button active" data-tab="gestion-participantes">Participantes</button>
+                <button class="tab-button" data-tab="gestion-notas">Notas</button>
+                <button class="tab-button" data-tab="registro-pagos">Registro Pagos</button>
+            </nav>
+            
+            <div id="gestion-participantes" class="tab-content active">
+                <h3>Listado de Participantes</h3>
+                <input type="text" id="search-participante" placeholder="Buscar por Nombre/Código">
+                <table id="participantes-table">
+                    <thead>
+                        <tr><th>Código</th><th>Participante</th><th>Deuda ($)</th><th>Ver Detalle</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-            <div id="logout">
-                <p id="user-info" style="margin-bottom: 10px; font-size: 0.9em;"></p>
-                <div class="nav-item" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
-                </div>
+            
+            <div id="gestion-notas" class="tab-content">
+                <h3>Gestión de Notas (Incidencias)</h3>
+                <button id="show-crear-nota">Crear Nueva Nota</button>
+                <table id="notas-table">
+                    <thead>
+                        <tr><th>ID</th><th>Participante</th><th>Situación</th><th>Estado</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-        </aside>
 
-        <main id="main-content">
-            <section id="dashboard" class="module-view active">
-                <h1 style="color: var(--color-primario-dark); margin-bottom: 20px;">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard General
-                </h1>
+            <div id="registro-pagos" class="tab-content">
+                <h3>Registro de Pagos</h3>
+                <form id="pago-form">
+                    <input type="text" id="pago-codigo" placeholder="Código Participante" required>
+                    <div id="meses-pendientes-container">
+                        </div>
+                    <p>Deuda a pagar (seleccionada): <span id="monto-a-pagar">$0</span></p>
+                    <button type="submit">Registrar Pago</button>
+                    <p id="pago-message" class="error-text"></p>
+                </form>
+            </div>
+        </section>
 
-                <div id="admin-stats" class="grid-3" style="display: none;">
-                    <div class="card">
-                        <h3><i class="fas fa-dollar-sign"></i> Total Recibido (ACUM.)</h3>
-                        <p class="value" id="stat-total-recibido">...</p>
-                    </div>
-                    <div class="card">
-                        <h3><i class="fas fa-hand-holding-usd"></i> Media por Aporte</h3>
-                        <p class="value" id="stat-media-aporte">...</p>
-                    </div>
-                    <div class="card">
-                        <h3><i class="fas fa-users"></i> Participantes Activos</h3>
-                        <p class="value" id="stat-participantes-activos">...</p>
-                    </div>
-                </div>
-
-                <div id="admin-charts" class="grid-3" style="display: none;">
-                    <div class="card" style="grid-column: span 2;">
-                        <h3><i class="fas fa-chart-bar"></i> Aportes Recibidos por Mes y Año</h3>
-                        <canvas id="aportesChart" height="120"></canvas>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3><i class="fas fa-list-alt"></i> Últimos 10 Aportes Registrados</h3>
-                    <div class="card-info" id="ultimos-aportes-list">
-                        <p>Cargando últimos aportes...</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="participantes-aportes" class="module-view">
-                <h1 style="color: var(--color-primario-dark); margin-bottom: 20px;">
-                    <i class="fas fa-users"></i> Gestión de Participantes y Aportes
-                </h1>
-
-                <div class="controls">
-                    <input type="text" id="participantes-search" placeholder="Buscar por Nombre o Código"
-                        onkeyup="filterParticipantes()" />
-                    <button class="btn-primary" id="btn-nuevo-participante" onclick="alert('Funcionalidad CRUD pendiente.')" style="display: none;">
-                        <i class="fas fa-plus"></i> Nuevo Participante
-                    </button>
-                </div>
-
-                <div class="card">
-                    <h3><i class="fas fa-table"></i> Listado de Participantes</h3>
-                    <table id="participantes-table">
-                        <thead>
-                            <tr>
-                                <th>Cód.</th>
-                                <th>Nombre</th>
-                                <th>Tutora</th>
-                                <th>Estado</th>
-                                <th>Último Pago</th>
-                                <th>Meses Deuda</th>
-                                <th>Total Deuda</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="participantes-tbody">
-                            <tr>
-                                <td colspan="8">Cargando participantes...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="registro-actividad" class="module-view">
-                <h1 style="color: var(--color-primario-dark); margin-bottom: 20px;">
-                    <i class="fas fa-history"></i> Registro de Actividad
-                </h1>
-
-                <div class="controls">
-                    <button class="btn-secondary" onclick="fetchActividad()"><i class="fas fa-sync"></i> Actualizar
-                        Actividad</button>
-                    <button class="btn-primary" onclick="borrarActividad(null)"><i class="fas fa-trash"></i>
-                        Borrar Todo (ADMIN)</button>
-                </div>
-
-                <div class="card">
-                    <h3><i class="fas fa-list-ul"></i> Historial de Transacciones y Errores</h3>
-                    <table id="actividad-table">
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>Usuario</th>
-                                <th>Acción</th>
-                                <th>Detalle</th>
-                                <th>...</th>
-                            </tr>
-                        </thead>
-                        <tbody id="actividad-tbody">
-                            <tr>
-                                <td colspan="5">Cargando actividad...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-
-        <div id="aporte-modal-overlay" class="modal-overlay">
-            <form id="aporte-form" class="modal-content">
-                <span class="close-btn" onclick="closeAporteModal()">&times;</span>
-                <h2 id="modal-title-aporte" style="color: var(--color-primario);">Registrar Aporte</h2>
-
-                <div id="participante-details" class="card-info">
-                    <p><strong>Cód.:</strong> <span id="reg-codigo"></span> | 
-                    <strong>Nombre:</strong> <span id="reg-nombre"></span></p>
-                    <p><strong>Tutora:</strong> <span id="reg-tutora"></span> | 
-                    <strong>Último Pago:</strong> <span id="reg-ultimo-pago"></span></p>
-                    <p style="margin-top: 10px;">
-                        <strong>Abono a Favor:</strong> <span id="reg-abono" class="tag-activo"></span> | 
-                        <strong>Deuda Neta:</strong> <span id="reg-deuda-total" class="tag-inactivo"></span>
-                    </p>
-                </div>
-
-                <h3>1. Seleccionar Meses a Pagar</h3>
-                <p style="font-size: 0.9em; margin-bottom: 10px;">
-                    Clic en los meses con ❌ para seleccionarlos. ✅ ya están pagos.
-                </p>
-                <div class="meses-grid" id="meses-grid-container">
-                    </div>
-
-                <h3>2. Resumen y Monto Recibido</h3>
-                <div class="card-info" style="background-color: #d1fae5; border-left-color: var(--color-secundario);">
-                    <p>Meses Seleccionados: <strong id="res-conteo">0</strong></p>
-                    <p>Valor Total a Cubrir: <strong id="res-total-calculado" style="color: var(--color-primario-dark);"> $0</strong></p>
-                </div>
-                
-                <div style="margin-top: 15px;">
-                    <label for="monto-dado" style="display: block; font-weight: 600;">Monto Recibido del Padre:</label>
-                    <input type="number" id="monto-dado" placeholder="Ej: 5000" min="0" required 
-                           style="max-width: 100%; margin-top: 5px;" oninput="updateMontoDado()">
-                </div>
-
-                <div class="card-info" style="margin-top: 15px;">
-                    <p>Nuevo Abono Restante: <strong id="res-nuevo-abono" style="color: var(--color-secundario);"> $0</strong></p>
-                    <p style="font-size: 0.8em; margin-top: 5px; color: #666;">
-                        (Monto dado - Deuda neta). Se actualizará en la hoja.
-                    </p>
-                </div>
-
-                <div style="margin-top: 30px; text-align: right;">
-                    <button type="submit" class="btn-primary" id="btn-registrar">
-                        <i class="fas fa-check-circle"></i> Registrar Aporte
-                    </button>
-                    <button type="button" class="btn-secondary" onclick="closeAporteModal()">
-                        Cancelar
-                    </button>
-                </div>
-            </form>
+        <section id="detalle-view" class="view" style="display: none;">
+            <button id="back-to-dashboard">← Volver</button>
+            <h2 id="detalle-nombre">Detalle de: [Nombre]</h2>
+            <p><strong>Código:</strong> <span id="detalle-codigo"></span></p>
+            <p><strong>URL para Padre:</strong> <span id="detalle-url-padre"></span> <button onclick="copyUrl()">Copiar URL</button></p>
+            
+            <div class="summary-box">
+                <p>Deuda Pendiente: <strong id="detalle-deuda-total" class="deuda-pendiente"></strong></p>
+                <p>Meses Pendientes: <span id="detalle-meses-pendientes"></span></p>
+            </div>
+            
+            <h3>Historial de Pagos</h3>
+            <table id="historial-pagos-table">
+                <thead><tr><th>ID Pago</th><th>Meses</th><th>Monto</th><th>Fecha</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            
+            <h3>Notas Creadas</h3>
+            <table id="historial-notas-table">
+                <thead><tr><th>ID Nota</th><th>Situación</th><th>Estado</th><th>Solución</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </section>
+        
+        <div id="nota-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button" onclick="document.getElementById('nota-modal').style.display='none'">&times;</span>
+                <h3>Crear Nueva Nota</h3>
+                <form id="crear-nota-form">
+                    <select id="nota-participante" required>
+                        </select>
+                    <textarea id="nota-situacion" placeholder="Describa la situación/incidencia" rows="4" required></textarea>
+                    <button type="submit">Guardar Nota</button>
+                    <p id="nota-message" class="error-text"></p>
+                </form>
+            </div>
         </div>
 
-    </div>
+        <div id="solucion-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button" onclick="document.getElementById('solucion-modal').style.display='none'">&times;</span>
+                <h3 id="solucion-titulo">Solucionar Nota #</h3>
+                <p>Situación: <strong id="solucion-situacion"></strong></p>
+                <form id="cerrar-nota-form">
+                    <input type="hidden" id="cerrar-nota-id">
+                    <textarea id="cerrar-nota-solucion" placeholder="Describa la solución aplicada" rows="4" required></textarea>
+                    <button type="submit">Cerrar Nota</button>
+                    <p id="solucion-message" class="error-text"></p>
+                </form>
+            </div>
+        </div>
+        
+    </main>
 
     <script>
-        // =========================================================
-        // JAVASCRIPT CORE
-        // =========================================================
+        // ** Importante: Reemplaza esta URL con la URL de tu Despliegue de Apps Script **
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjpjLxF793t7qSbAak9haJkAVdoLfUy9HbauNFtEWspnDoWDqznYvslRBiB-He85El/exec'; 
 
-        // ⚠️ REEMPLAZAR con la URL de implementación de tu Apps Script (termina en /exec)
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwI5mA0fHhXuHtJXZfDaKTCpxH8Cmhf6qrTuPEthFvz7vMcIWmv94uO53TtrFktrKHN/exec';
+let CURRENT_USER = null; // Almacenará { rol, codigo, url_id }
 
-const $ = id => document.getElementById(id);
+// ====================================================================
+// UTILIDADES Y COMUNICACIÓN CON APPS SCRIPT
+// ====================================================================
 
-        let APP_DATA = {
-            token: localStorage.getItem('sessionToken'),
-            rol: localStorage.getItem('userRol'),
-            tutoraID: localStorage.getItem('tutoraID'),
-            usuario: localStorage.getItem('usuario'),
-            participantes: [],
-            ultimosAportes: [],
-            actividad: [],
-            estadisticas: {}
+/**
+ * Función para enviar peticiones POST al Apps Script.
+ * @param {string} action - La acción que el backend debe ejecutar.
+ * @param {object} data - Datos a enviar.
+ * @returns {Promise<object>}
+ */
+async function callBackend(action, data = {}) {
+    const payload = { action, data };
+    
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors', // Necesario para llamadas entre dominios (GitHub Pages a Google)
+            headers: {
+                'Content-Type': 'text/plain', // Apps Script a menudo requiere 'text/plain' para el JSON
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        // Apps Script devuelve un Content-Type: text/html, por lo que usamos response.text()
+        const text = await response.text();
+        return JSON.parse(text);
+
+    } catch (error) {
+        console.error('Error al llamar al backend:', error);
+        return { success: false, message: 'Fallo de conexión con el servidor.' };
+    }
+}
+
+/**
+ * Función para cambiar la vista en la SPA (Single Page Application).
+ * @param {string} viewId - ID de la sección a mostrar (ej: 'login-view').
+ */
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(view => {
+        view.style.display = 'none';
+        view.classList.remove('active');
+    });
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+        targetView.style.display = 'block';
+        targetView.classList.add('active');
+        // Limpiar mensajes de error al cambiar de vista
+        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+    }
+    // Mostrar/ocultar botón de cerrar sesión
+    document.getElementById('logout-btn').style.display = (viewId !== 'login-view' ? 'block' : 'none');
+}
+
+// ====================================================================
+// VISTA DE LOGIN Y SESIÓN
+// ====================================================================
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value.trim();
+    const contrasena = document.getElementById('contrasena').value;
+    const msgEl = document.getElementById('login-message');
+    msgEl.textContent = 'Iniciando sesión...';
+
+    const result = await callBackend('LOGIN', { usuario, contrasena });
+
+    if (result.success) {
+        CURRENT_USER = result;
+        localStorage.setItem('currentUser', JSON.stringify(CURRENT_USER)); // Guardar sesión
+        msgEl.textContent = 'Éxito. Redirigiendo...';
+        
+        // Manejo de roles
+        if (CURRENT_USER.rol === 'Administrador' || CURRENT_USER.rol === 'Profesor') {
+            initAdminDashboard();
+            showView('admin-dashboard-view');
+        } else if (CURRENT_USER.rol === 'Padre') {
+            loadDetalleParticipante(CURRENT_USER.codigo);
+            showView('detalle-view');
+        }
+    } else {
+        msgEl.textContent = result.message || 'Error de autenticación.';
+        CURRENT_USER = null;
+    }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+    CURRENT_USER = null;
+    localStorage.removeItem('currentUser');
+    showView('login-view');
+});
+
+// Inicialización al cargar la página (manejo de URL para padres o sesión guardada)
+window.onload = () => {
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get('id');
+
+    if (urlId) {
+        // Lógica de URL pública para padre (simula un login de tipo "Padre")
+        CURRENT_USER = { rol: 'Padre', codigo: urlId, url_id: urlId }; // Usamos el ID como código temporal
+        loadDetalleParticipante(urlId);
+        showView('detalle-view');
+    } else {
+        // Cargar sesión guardada si existe
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            CURRENT_USER = JSON.parse(storedUser);
+            if (CURRENT_USER.rol === 'Administrador' || CURRENT_USER.rol === 'Profesor') {
+                initAdminDashboard();
+                showView('admin-dashboard-view');
+            } else if (CURRENT_USER.rol === 'Padre') {
+                loadDetalleParticipante(CURRENT_USER.codigo);
+                showView('detalle-view');
+            } else {
+                showView('login-view');
+            }
+        } else {
+            showView('login-view');
+        }
+    }
+};
+
+// ====================================================================
+// DASHBOARD Y GESTIÓN ADMINISTRATIVA
+// ====================================================================
+
+let dashboardInterval = null;
+let allParticipantes = []; // Cache para la búsqueda
+
+function initAdminDashboard() {
+    // 1. Cargar datos iniciales
+    loadDashboardData();
+    
+    // 2. Establecer el refresco de 5 segundos
+    if (dashboardInterval) clearInterval(dashboardInterval); // Limpia si ya existe
+    dashboardInterval = setInterval(loadDashboardData, 5000); // ** Refresco cada 5 segundos **
+
+    // 3. Manejo de pestañas
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(this.dataset.tab).classList.add('active');
+        });
+    });
+
+    // 4. Búsqueda de participantes
+    document.getElementById('search-participante').addEventListener('input', filterParticipantes);
+}
+
+// Función para el refresco asíncrono
+async function loadDashboardData() {
+    console.log('Refrescando datos del dashboard...');
+    const result = await callBackend('GET_DASHBOARD_DATA', { rol: CURRENT_USER.rol });
+
+    if (result.success) {
+        allParticipantes = result.participantes;
+        
+        // Actualizar Participantes
+        renderParticipantesTable(allParticipantes);
+        
+        // Actualizar Notas (solo si la pestaña está activa o lo necesitamos)
+        if (document.getElementById('gestion-notas').classList.contains('active')) {
+             renderNotasTable(result.notas);
+        }
+        
+        // Cargar select de crear nota
+        renderParticipanteSelect(allParticipantes);
+        
+    } else {
+        console.error('Fallo al cargar dashboard:', result.message);
+    }
+}
+
+function filterParticipantes(e) {
+    const filtro = e.target.value.toLowerCase();
+    const filtered = allParticipantes.filter(p => 
+        p.nombre.toLowerCase().includes(filtro) || 
+        p.codigo.toLowerCase().includes(filtro)
+    );
+    renderParticipantesTable(filtered);
+}
+
+// Dibuja la tabla de participantes (Admin View)
+function renderParticipantesTable(data) {
+    const tbody = document.getElementById('participantes-table').querySelector('tbody');
+    tbody.innerHTML = '';
+
+    data.forEach(p => {
+        const row = tbody.insertRow();
+        row.insertCell().textContent = p.codigo;
+        row.insertCell().textContent = p.nombre;
+        row.insertCell().textContent = `$${p.deudaTotal.toLocaleString()}`;
+        
+        const actionCell = row.insertCell();
+        const detailBtn = document.createElement('button');
+        detailBtn.textContent = 'Detalle';
+        detailBtn.onclick = () => {
+            clearInterval(dashboardInterval); // Detiene el refresco al ver detalle
+            loadDetalleParticipante(p.codigo);
+            showView('detalle-view');
         };
-        let currentModule = 'dashboard';
-        let participantesOriginal = [];
-        let participantesFiltrados = [];
-        let myChart = null; // Variable para la instancia de Chart.js
+        actionCell.appendChild(detailBtn);
+    });
+}
 
-        // --- Utilidades ---
-        const formatMoney = amount => `$${Number(amount).toLocaleString('es-CO')}`;
-        const getCurrentDate = () => new Date().toISOString().slice(0, 10);
+// Dibuja la tabla de notas (Admin View)
+function renderNotasTable(data) {
+    const tbody = document.getElementById('notas-table').querySelector('tbody');
+    tbody.innerHTML = '';
 
-        // --- Core de Conexión ---
-        async function sendToAppsScript(action, payload) {
-            const dataToSend = { ...payload, action: action, token: APP_DATA.token };
+    data.forEach(n => {
+        const row = tbody.insertRow();
+        row.insertCell().textContent = n.id;
+        row.insertCell().textContent = n.participante;
+        row.insertCell().textContent = n.situacion.substring(0, 50) + '...';
+        
+        const estadoCell = row.insertCell();
+        estadoCell.textContent = n.estado;
+        estadoCell.style.fontWeight = 'bold';
+        estadoCell.style.color = n.estado === 'ABIERTA' ? 'red' : 'green';
+        
+        const actionCell = row.insertCell();
+        const actionBtn = document.createElement('button');
+        actionBtn.textContent = n.estado === 'ABIERTA' ? 'Solucionar' : 'Ver Solución';
+        actionBtn.onclick = () => openSolucionModal(n);
+        actionCell.appendChild(actionBtn);
+    });
+}
 
-            try {
-                // Apps Script requiere el Content-Type como text/plain para un POST simple
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors', 
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(dataToSend)
-                });
+// Carga el Select para la creación de notas
+function renderParticipanteSelect(participantes) {
+    const select = document.getElementById('nota-participante');
+    select.innerHTML = '<option value="" disabled selected>Seleccione Participante</option>';
+    participantes.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.nombre;
+        option.textContent = `${p.nombre} (${p.codigo})`;
+        select.appendChild(option);
+    });
+}
 
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
-                }
+// ====================================================================
+// GESTIÓN DE NOTAS (Admin)
+// ====================================================================
 
-                const result = await response.json();
-                
-                if (result.status === 'error') {
-                    throw new Error(result.message);
-                }
+document.getElementById('show-crear-nota').addEventListener('click', () => {
+    document.getElementById('nota-modal').style.display = 'block';
+    document.getElementById('crear-nota-form').reset();
+    document.getElementById('nota-message').textContent = '';
+});
 
-                return result.data;
+document.getElementById('crear-nota-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const participante = document.getElementById('nota-participante').value;
+    const situacion = document.getElementById('nota-situacion').value;
+    const msgEl = document.getElementById('nota-message');
+    msgEl.textContent = 'Guardando nota...';
 
-            } catch (error) {
-                console.error('Error en sendToAppsScript:', error);
-                alert(`Error: ${error.message}`);
-                // Si el error es de sesión/token, forzar logout
-                if (error.message.includes('Sesión expirada') || error.message.includes('token inválido')) {
-                    logout();
-                }
-                throw error;
-            }
+    const result = await callBackend('CREAR_NOTA', { participante, situacion });
+
+    if (result.success) {
+        msgEl.textContent = result.message;
+        document.getElementById('crear-nota-form').reset();
+        loadDashboardData(); // Refresca la tabla de notas
+        setTimeout(() => {
+            document.getElementById('nota-modal').style.display = 'none';
+        }, 1500);
+    } else {
+        msgEl.textContent = result.message || 'Error al crear la nota.';
+    }
+});
+
+function openSolucionModal(nota) {
+    const modal = document.getElementById('solucion-modal');
+    document.getElementById('solucion-titulo').textContent = `Solucionar Nota #${nota.id}`;
+    document.getElementById('solucion-situacion').textContent = nota.situacion;
+    document.getElementById('cerrar-nota-id').value = nota.id;
+    document.getElementById('solucion-message').textContent = '';
+    
+    const solucionTextarea = document.getElementById('cerrar-nota-solucion');
+    
+    if (nota.estado === 'CERRADA') {
+        solucionTextarea.value = nota.solucion;
+        solucionTextarea.readOnly = true;
+        document.querySelector('#cerrar-nota-form button[type="submit"]').style.display = 'none';
+    } else {
+        solucionTextarea.value = '';
+        solucionTextarea.readOnly = false;
+        document.querySelector('#cerrar-nota-form button[type="submit"]').style.display = 'block';
+    }
+    
+    modal.style.display = 'block';
+}
+
+document.getElementById('cerrar-nota-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = parseInt(document.getElementById('cerrar-nota-id').value);
+    const solucion = document.getElementById('cerrar-nota-solucion').value;
+    const msgEl = document.getElementById('solucion-message');
+    msgEl.textContent = 'Cerrando nota...';
+
+    const result = await callBackend('CERRAR_NOTA', { id, solucion });
+
+    if (result.success) {
+        msgEl.textContent = result.message;
+        loadDashboardData(); // Refresca la tabla de notas
+        setTimeout(() => {
+            document.getElementById('solucion-modal').style.display = 'none';
+        }, 1500);
+    } else {
+        msgEl.textContent = result.message || 'Error al cerrar la nota.';
+    }
+});
+
+// ====================================================================
+// REGISTRO DE PAGOS (Admin)
+// ====================================================================
+
+// Alerta: Este es un formulario simple. La lógica avanzada de tu VBA debe manejarse en GAS.
+let mesesPendientesCache = []; // Cache de meses pendientes para la selección de pagos
+
+document.getElementById('pago-codigo').addEventListener('input', async (e) => {
+    const codigo = e.target.value.trim().toUpperCase();
+    const container = document.getElementById('meses-pendientes-container');
+    container.innerHTML = 'Buscando...';
+    document.getElementById('monto-a-pagar').textContent = '$0';
+    mesesPendientesCache = [];
+
+    if (codigo.length < 5) return;
+
+    // Llama al detalle para obtener la lista de meses pendientes
+    const result = await callBackend('GET_PARTICIPANTE_DETALLE', { codigo });
+
+    container.innerHTML = '';
+    if (result.success) {
+        mesesPendientesCache = result.resumen_pago.mesesPendientes;
+        if (mesesPendientesCache.length === 0) {
+            container.textContent = 'No hay meses pendientes de pago.';
+            return;
         }
 
-        // =========================================================
-        // 1. LÓGICA DE LOGIN Y SESIÓN
-        // =========================================================
-
-        function init() {
-            if (APP_DATA.token && APP_DATA.rol) {
-                // Si hay token, intentar cargar los datos
-                showApp();
-                fetchInitialData();
-            } else {
-                // Si no hay token, mostrar login
-                showLogin();
-            }
-        }
-
-        function showLogin() {
-            $('login-view').style.display = 'flex';
-            $('app-container').style.display = 'none';
-        }
-
-        function showApp() {
-            $('login-view').style.display = 'none';
-            $('app-container').style.display = 'grid';
-
-            // Mostrar info de usuario en el sidebar
-            $('user-info').innerHTML = `Logueado como: <strong>${APP_DATA.usuario}</strong> (${APP_DATA.rol})`;
-
-            // Filtrar módulos por rol
-            document.querySelectorAll('.nav-item').forEach(item => {
-                const requiredRoles = item.getAttribute('data-roles').split(',');
-                if (requiredRoles.includes(APP_DATA.rol)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // Mostrar/Ocultar controles de ADMIN
-            if (APP_DATA.rol === 'ADMIN') {
-                $('btn-nuevo-participante').style.display = 'inline-block';
-            }
-        }
-
-        $('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const user = $('username').value;
-            const password = $('password').value;
-            $('login-btn').disabled = true;
-            $('login-message').innerText = 'Iniciando sesión...';
-
-            try {
-                const result = await sendToAppsScript('login', { user, password });
-                
-                // Guardar sesión
-                APP_DATA.token = result.token;
-                APP_DATA.rol = result.rol;
-                APP_DATA.tutoraID = result.tutoraID;
-                APP_DATA.usuario = result.usuario;
-                localStorage.setItem('sessionToken', result.token);
-                localStorage.setItem('userRol', result.rol);
-                localStorage.setItem('tutoraID', result.tutoraID);
-                localStorage.setItem('usuario', result.usuario);
-
-                $('login-message').innerText = '';
-                showApp();
-                fetchInitialData();
-
-            } catch (error) {
-                $('login-message').innerText = 'Error de credenciales.';
-                console.error('Login failed:', error);
-            } finally {
-                $('login-btn').disabled = false;
-            }
+        mesesPendientesCache.forEach(mes => {
+            const item = document.createElement('div');
+            item.className = 'mes-item';
+            item.dataset.mes = mes;
+            item.textContent = formatMes(mes); // Función de formato (definida abajo)
+            item.onclick = toggleMesSeleccionado;
+            container.appendChild(item);
         });
+    } else {
+        container.textContent = 'Participante no encontrado o error.';
+    }
+});
 
-        function logout() {
-            localStorage.clear();
-            APP_DATA.token = null;
-            APP_DATA.rol = null;
-            APP_DATA.tutoraID = null;
-            APP_DATA.usuario = null;
-            showLogin();
-            // Limpiar datos de la aplicación
-            APP_DATA.participantes = [];
-            APP_DATA.ultimosAportes = [];
-            APP_DATA.actividad = [];
-        }
+function formatMes(codigoMes) {
+    const anio = codigoMes.substring(0, 4);
+    const mes = codigoMes.substring(4, 6);
+    const nombres = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+    return `${nombres[parseInt(mes) - 1]} ${anio}`;
+}
 
+function toggleMesSeleccionado() {
+    this.classList.toggle('selected');
+    calculateMonto();
+}
 
-        // =========================================================
-        // 2. LÓGICA DE DATOS Y RENDERIZADO
-        // =========================================================
-
-        async function fetchInitialData() {
-            try {
-                const result = await sendToAppsScript('obtenerDatosIniciales', { 
-                    rol: APP_DATA.rol, 
-                    tutoraID: APP_DATA.tutoraID 
-                });
-
-                APP_DATA.participantes = result.participantes;
-                participantesOriginal = result.participantes;
-                participantesFiltrados = result.participantes; // Inicialmente, todos
-                APP_DATA.ultimosAportes = result.ultimosAportes;
-                APP_DATA.estadisticas = result.estadisticas;
-
-                // Renderizar la vista activa (por defecto dashboard)
-                switchModule(currentModule);
-
-            } catch (error) {
-                console.error('Error al cargar datos iniciales:', error);
-                alert('No se pudieron cargar los datos iniciales. Revisar consola o sesión.');
-            }
-        }
-
-        // --- Renderizado General ---
-        function switchModule(moduleName) {
-            currentModule = moduleName;
-            
-            // Ocultar todas las vistas
-            document.querySelectorAll('.module-view').forEach(view => view.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-
-            // Mostrar la vista y el ítem de navegación activo
-            $(moduleName).classList.add('active');
-            document.querySelector(`.nav-item[data-module="${moduleName}"]`).classList.add('active');
-
-            // Llamar a la función de renderizado específica
-            if (moduleName === 'dashboard') renderDashboard();
-            if (moduleName === 'participantes-aportes') renderParticipantesTable();
-            if (moduleName === 'registro-actividad') fetchActividad(); // Siempre cargar la actividad al entrar
-        }
-
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                switchModule(item.getAttribute('data-module'));
-            });
-        });
-
-        // =========================================================
-        // 2.1. DASHBOARD
-        // =========================================================
-        function renderDashboard() {
-            // Renderizar Estadísticas (Solo ADMIN)
-            if (APP_DATA.rol === 'ADMIN') {
-                $('admin-stats').style.display = 'grid';
-                $('admin-charts').style.display = 'grid';
-
-                const totalRecibido = APP_DATA.estadisticas.totalRecibido || 0;
-                const mediaAporte = APP_DATA.estadisticas.mediaAporte || 0;
-                const activos = APP_DATA.participantes.filter(p => p.estado === 'ACTIVO').length;
-
-                $('stat-total-recibido').innerText = formatMoney(totalRecibido);
-                $('stat-media-aporte').innerText = formatMoney(mediaAporte);
-                $('stat-participantes-activos').innerText = activos;
-                
-                renderAportesChart(APP_DATA.estadisticas.aportesPorMesAnio);
-
-            } else {
-                $('admin-stats').style.display = 'none';
-                $('admin-charts').style.display = 'none';
-            }
-
-            // Renderizar Últimos Aportes
-            const ul = $('ultimos-aportes-list');
-            ul.innerHTML = APP_DATA.ultimosAportes.map(aporte => {
-                return `<p>
-                            <i class="fas fa-arrow-circle-right"></i> 
-                            ${formatMoney(aporte.montoPagado)} para ${aporte.codigoParticipante} (Cubre: ${aporte.mesCubierto}) - ${new Date(aporte.fechaRegistro).toLocaleDateString()}
-                        </p>`;
-            }).join('');
-        }
-
-        function renderAportesChart(data) {
-            const ctx = $('aportesChart').getContext('2d');
-            if (myChart) myChart.destroy();
-
-            // Preparar datos (Ordenar por AAAA/MM)
-            const sortedKeys = Object.keys(data).sort();
-            const labels = sortedKeys.map(key => {
-                const [anio, mes] = key.split('/');
-                return `${mes}/${anio}`;
-            });
-            const amounts = sortedKeys.map(key => data[key]);
-
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Monto Recibido',
-                        data: amounts,
-                        backgroundColor: '#10b981', // var(--color-secundario)
-                        borderColor: '#34d399', // var(--color-secundario-light)
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Monto (COP)' },
-                            ticks: { callback: (value) => formatMoney(value) }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: false },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: (value) => formatMoney(value),
-                            color: '#333333' // var(--color-texto)
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
+function calculateMonto() {
+    let monto = 0;
+    document.querySelectorAll('.mes-item.selected').forEach(item => {
+        const mes = item.dataset.mes;
+        // La lógica de cálculo de precios está en el Apps Script.
+        // Aquí podríamos estimar, pero para simplificar, confiamos en el backend.
+        // Usaremos un valor fijo o cachearemos el precio para cada mes para no llamar al backend
+        // For simplicity: hardcoding the value based on your rules (GAS will do the real check)
+        if (mes >= '202201' && mes <= '202406') monto += 2000;
+        else if (mes >= '202407' && mes <= '202712') monto += 3000;
+    });
+    document.getElementById('monto-a-pagar').textContent = `$${monto.toLocaleString()}`;
+}
 
 
-        // =========================================================
-        // 2.2. PARTICIPANTES Y APORTES
-        // =========================================================
+document.getElementById('pago-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const codigo = document.getElementById('pago-codigo').value.trim().toUpperCase();
+    const msgEl = document.getElementById('pago-message');
+    const selectedMeses = Array.from(document.querySelectorAll('.mes-item.selected')).map(el => el.dataset.mes);
 
-        function filterParticipantes() {
-            const query = $('participantes-search').value.toLowerCase();
-            participantesFiltrados = participantesOriginal.filter(p =>
-                p.nombreCompleto.toLowerCase().includes(query) ||
-                p.codigo.toLowerCase().includes(query)
-            );
-            renderParticipantesTable();
-        }
+    if (selectedMeses.length === 0) {
+        msgEl.textContent = 'Seleccione al menos un mes para registrar el pago.';
+        return;
+    }
+    
+    msgEl.textContent = 'Registrando pago...';
 
-        function renderParticipantesTable() {
-            const tbody = $('participantes-tbody');
-            tbody.innerHTML = participantesFiltrados.map(p => {
-                const estadoClase = p.estado === 'ACTIVO' ? 'tag-activo' : 'tag-inactivo';
-                const deudaNeta = Math.max(0, p.estadoAportes.deudaTotal - p.abono);
+    const result = await callBackend('REGISTRAR_PAGO', { codigo, meses: selectedMeses });
 
-                return `
-                    <tr>
-                        <td>${p.codigo}</td>
-                        <td>${p.nombreCompleto}</td>
-                        <td>${p.tutoraID}</td>
-                        <td class="${estadoClase}">${p.estado}</td>
-                        <td>${p.estadoAportes.ultimoMesPago}</td>
-                        <td>${p.estadoAportes.mesesPendientes.length}</td>
-                        <td>${formatMoney(deudaNeta)}</td>
-                        <td>
-                            <button class="btn-primary" onclick="openAporteModal('${p.codigo}')">
-                                <i class="fas fa-cash-register"></i> Pagar
-                            </button>
-                            <button class="btn-url" onclick="copyURL('${p.tokenURL}')">
-                                <i class="fas fa-link"></i> URL
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
+    if (result.success) {
+        msgEl.textContent = result.message;
+        document.getElementById('pago-form').reset();
+        document.getElementById('meses-pendientes-container').innerHTML = ''; // Limpiar meses
+        document.getElementById('monto-a-pagar').textContent = '$0';
+        loadDashboardData(); // Refresca dashboard
+    } else {
+        msgEl.textContent = result.message || 'Error al registrar el pago.';
+    }
+});
 
-        function copyURL(token) {
-            const fullUrl = APPS_SCRIPT_URL + `?view=parent&token=${token}`;
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                alert(`URL copiada al portapapeles: ${fullUrl}`);
-            }).catch(err => {
-                console.error('Error al copiar: ', err);
-                alert('Error al copiar URL. Revisa la consola.');
-            });
-        }
+// ====================================================================
+// VISTA DE DETALLE (PADRE O ADMIN)
+// ====================================================================
+
+document.getElementById('back-to-dashboard').addEventListener('click', () => {
+    if (CURRENT_USER && (CURRENT_USER.rol === 'Administrador' || CURRENT_USER.rol === 'Profesor')) {
+        initAdminDashboard();
+        showView('admin-dashboard-view');
+    } else {
+        // Si el padre está viendo por URL, no hay dashboard, solo se regresa al login
+        showView('login-view');
+    }
+});
 
 
-        // --- Lógica del Modal de Registro de Aportes ---
+async function loadDetalleParticipante(codigo) {
+    const result = await callBackend('GET_PARTICIPANTE_DETALLE', { codigo });
+    showView('detalle-view');
+    
+    if (result.success) {
+        const p = result.participante;
+        const resumen = result.resumen_pago;
 
-        let currentParticipante = null;
-
-        function openAporteModal(codigo) {
-            currentParticipante = participantesOriginal.find(p => p.codigo === codigo);
-
-            if (!currentParticipante) {
-                alert('Error: Participante no encontrado.');
-                return;
-            }
-
-            // Datos generales
-            $('reg-codigo').innerText = currentParticipante.codigo;
-            $('reg-nombre').innerText = currentParticipante.nombreCompleto;
-            $('reg-tutora').innerText = currentParticipante.tutoraID;
-            $('reg-ultimo-pago').innerText = currentParticipante.estadoAportes.ultimoMesPago;
-            $('reg-abono').innerText = formatMoney(currentParticipante.abono);
-
-            const deudaNeta = Math.max(0, currentParticipante.estadoAportes.deudaTotal - currentParticipante.abono);
-            $('reg-deuda-total').innerText = formatMoney(deudaNeta);
-
-            // Renderizar la grilla de meses
-            renderMesesGrid(currentParticipante.estadoAportes.mesesHistoricos);
-            
-            // Resetear y mostrar modal
-            $('aporte-form').reset();
-            $('monto-dado').value = 0;
-            updateAporteSummary();
-            $('aporte-modal-overlay').classList.add('visible');
-        }
-
-        function closeAporteModal() {
-            currentParticipante = null;
-            $('aporte-modal-overlay').classList.remove('visible');
+        // Datos del participante
+        document.getElementById('detalle-nombre').textContent = `Detalle de: ${p.nombre}`;
+        document.getElementById('detalle-codigo').textContent = p.codigo;
+        
+        // URL del Padre (solo relevante si el admin la está viendo)
+        const appUrlBase = window.location.href.split('?')[0];
+        const urlPadreEl = document.getElementById('detalle-url-padre');
+        
+        if (CURRENT_USER.rol === 'Padre') {
+            document.querySelector('#detalle-url-padre').parentNode.style.display = 'none';
+        } else {
+            document.querySelector('#detalle-url-padre').parentNode.style.display = 'block';
+            urlPadreEl.textContent = `${appUrlBase}?id=${result.url_id}`;
         }
         
-        // Al enviar el formulario de registro de aporte
-        $('aporte-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const montoDado = Number($('monto-dado').value);
-            const mesesSeleccionados = Array.from(document.querySelectorAll('.mes-seleccionado')).map(el => el.dataset.mes);
-            const totalCalculado = mesesSeleccionados.reduce((sum, mes) => {
-                const { valor } = currentParticipante.estadoAportes.mesesPendientes.find(m => m.mesAnio === mes) || { valor: 0 };
-                return sum + valor;
-            }, 0);
+        // Resumen
+        document.getElementById('detalle-deuda-total').textContent = `$${resumen.deudaTotal.toLocaleString()}`;
+        document.getElementById('detalle-meses-pendientes').textContent = resumen.mesesPendientes.map(formatMes).join(' | ') || 'Ninguno.';
 
-            if (mesesSeleccionados.length === 0) {
-                alert('Debe seleccionar al menos un mes para registrar el aporte.');
-                return;
-            }
-            if (montoDado < totalCalculado) {
-                 if (!confirm(`El monto dado (${formatMoney(montoDado)}) es menor al valor de los meses seleccionados (${formatMoney(totalCalculado)}). ¿Desea registrar este pago parcial?`)) {
-                    return;
-                }
-            }
-
-
-            $('btn-registrar').disabled = true;
-            $('btn-registrar').innerHTML = `<i class="fas fa-spinner fa-spin"></i> Registrando...`;
-
-            const payload = {
-                participanteID: currentParticipante.codigo,
-                mesesSeleccionados: mesesSeleccionados,
-                montoDado: montoDado,
-                totalCalculado: totalCalculado,
-                abonoAnterior: currentParticipante.abono,
-                registrador: APP_DATA.usuario,
-                rowIndex: currentParticipante.rowIndex
-            };
-
-            try {
-                await sendToAppsScript('registrarAporte', payload);
-                alert('✅ Aporte registrado con éxito. Se notificó por Telegram.');
-                closeAporteModal();
-                // Refrescar datos y tabla
-                await fetchInitialData(); 
-            } catch (error) {
-                console.error('Fallo al registrar aporte:', error);
-                alert('Fallo al registrar aporte. Ver consola.');
-            } finally {
-                $('btn-registrar').disabled = false;
-                $('btn-registrar').innerHTML = `<i class="fas fa-check-circle"></i> Registrar Aporte`;
-            }
+        // Historial de Pagos
+        const pagosTbody = document.getElementById('historial-pagos-table').querySelector('tbody');
+        pagosTbody.innerHTML = '';
+        result.pagos.forEach(pago => {
+            const row = pagosTbody.insertRow();
+            row.insertCell().textContent = pago.id;
+            row.insertCell().textContent = pago.meses.split(', ').map(formatMes).join(', ');
+            row.insertCell().textContent = `$${pago.monto.toLocaleString()}`;
+            row.insertCell().textContent = pago.fecha;
         });
 
-        // Grilla de Meses
-        function renderMesesGrid(mesesHistoricos) {
-            const container = $('meses-grid-container');
-            container.innerHTML = ''; // Limpiar
+        // Notas Creadas
+        const notasTbody = document.getElementById('historial-notas-table').querySelector('tbody');
+        notasTbody.innerHTML = '';
+        result.notas.forEach(nota => {
+            const row = notasTbody.insertRow();
+            row.insertCell().textContent = nota.id;
+            row.insertCell().textContent = nota.situacion;
+            const estadoCell = row.insertCell();
+            estadoCell.textContent = nota.estado;
+            estadoCell.style.color = nota.estado === 'ABIERTA' ? 'red' : 'green';
+            row.insertCell().textContent = nota.solucion || 'Pendiente';
+        });
 
-            // Invertir para mostrar lo más reciente primero
-            mesesHistoricos.slice().reverse().forEach(mes => {
-                const isPagado = mes.pagado;
-                const mesAnio = mes.mesAnio;
-                const valor = formatMoney(mes.valor);
-                // Determinar si es deuda (pasado o presente)
-                const isDeuda = !isPagado && new Date(`${mesAnio.split('/')[1]}-${mesAnio.split('/')[0]}-01T00:00:00Z`).getTime() < Date.now();
-                
-                const clase = isPagado ? 'mes-pagado' : isDeuda ? 'mes-deuda' : 'mes-item';
-                const icon = isPagado ? '✅' : '❌';
+    } else {
+        alert(result.message);
+        showView('admin-dashboard-view');
+    }
+}
 
-                const item = document.createElement('div');
-                item.className = `mes-item ${clase}`;
-                item.dataset.mes = mesAnio;
-                item.dataset.valor = mes.valor;
-                item.innerHTML = `${icon} ${mesAnio} (${valor})`;
-
-                if (!isPagado) {
-                    item.onclick = toggleMesSeleccionado;
-                }
-                container.appendChild(item);
-            });
-        }
-        
-        function toggleMesSeleccionado(event) {
-            const item = event.currentTarget;
-            item.classList.toggle('mes-seleccionado');
-            updateAporteSummary();
-        }
-
-        function updateAporteSummary() {
-            const mesesSeleccionados = document.querySelectorAll('.mes-seleccionado');
-            let totalCalculado = 0;
-            
-            mesesSeleccionados.forEach(item => {
-                totalCalculado += Number(item.dataset.valor);
-            });
-
-            const abonoAnterior = currentParticipante ? Number(currentParticipante.abono) : 0;
-            const montoDado = Number($('monto-dado').value) || 0;
-            const deudaNeta = Math.max(0, totalCalculado - abonoAnterior);
-            const nuevoAbono = Math.max(0, montoDado - deudaNeta);
-            
-            $('res-conteo').innerText = mesesSeleccionados.length;
-            $('res-total-calculado').innerText = formatMoney(totalCalculado);
-            $('res-nuevo-abono').innerText = formatMoney(nuevoAbono);
-        }
-
-        function updateMontoDado() {
-            // Se llama cada vez que el usuario escribe en el monto
-            updateAporteSummary();
-        }
-
-
-        // =========================================================
-        // 2.3. REGISTRO DE ACTIVIDAD
-        // =========================================================
-
-        async function fetchActividad() {
-            if (APP_DATA.rol !== 'ADMIN') return;
-
-            try {
-                const result = await sendToAppsScript('obtenerActividad', {});
-                APP_DATA.actividad = result;
-                renderActividadTable();
-            } catch (error) {
-                console.error('Fallo al cargar actividad:', error);
-            }
-        }
-
-        function renderActividadTable() {
-            const tbody = $('actividad-tbody');
-            tbody.innerHTML = APP_DATA.actividad.map(a => {
-                const rowClase = a.accion.includes('ERROR') ? 'style="background-color: #fee2e2;"' : '';
-                const timestamp = new Date(a.timestamp).toLocaleString('es-CO');
-                
-                return `
-                    <tr ${rowClase}>
-                        <td>${timestamp}</td>
-                        <td>${a.usuario}</td>
-                        <td><strong>${a.accion}</strong></td>
-                        <td>${a.detalle}</td>
-                        <td>
-                            <button class="btn-secondary" onclick="borrarActividad(${a.rowIndex})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            if (APP_DATA.actividad.length === 0) {
-                 tbody.innerHTML = `<tr><td colspan="5">No hay registros de actividad.</td></tr>`;
-            }
-        }
-
-        async function borrarActividad(rowIndex) {
-            if (APP_DATA.rol !== 'ADMIN') {
-                alert('Permisos insuficientes.');
-                return;
-            }
-
-            if (!confirm(rowIndex ? `¿Está seguro de eliminar el registro en la fila ${rowIndex}?` : '¿Está seguro de borrar TODO el registro de actividad?')) {
-                return;
-            }
-
-            try {
-                await sendToAppsScript('borrarActividad', { rowIndex: rowIndex, registrador: APP_DATA.usuario });
-                alert('Borrado exitoso.');
-                fetchActividad(); // Recargar la tabla
-            } catch (error) {
-                console.error('Error al borrar actividad:', error);
-                alert('Fallo al borrar actividad. Ver consola.');
-            }
-        }
-
-
-        // =========================================================
-        // INICIO
-        // =========================================================
-        window.onload = init;
+function copyUrl() {
+    const urlText = document.getElementById('detalle-url-padre').textContent;
+    navigator.clipboard.writeText(urlText).then(() => {
+        alert('URL copiada al portapapeles.');
+    }, (err) => {
+        alert('Error al copiar URL.');
+    });
+}
     </script>
 </body>
-
 </html>
