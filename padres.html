@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Aportes - <?= participante.nombreCompleto ?></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-center text-blue-600">Estado de Aportes Familiar</h1>
+        <p class="text-center text-gray-600 mb-8">Información actualizada para: <span class="font-semibold"><?= participante.nombreCompleto ?></span></p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-center">
+            <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
+                <p class="text-sm font-medium text-gray-500">Deuda Total Pendiente</p>
+                <p class="text-xl font-bold text-red-600 mt-1">$<?= participante.estadoAportes.deudaTotal.toLocaleString('es-CO') ?></p>
+            </div>
+            <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
+                <p class="text-sm font-medium text-gray-500">Último Mes Pagado</p>
+                <p class="text-xl font-bold text-gray-800 mt-1"><?= participante.estadoAportes.ultimoMesPago ?></p>
+            </div>
+            <div class="p-4 border border-blue-200 rounded-lg bg-blue-50">
+                <p class="text-sm font-medium text-gray-500">Abono a Favor</p>
+                <p class="text-xl font-bold text-green-600 mt-1">$<?= participante.abono.toLocaleString('es-CO') ?></p>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Historial Anual de Pagos (2022 - <?= new Date().getFullYear() ?>)</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-300 text-center">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-3 py-2 text-xs font-medium text-gray-600 uppercase">Año</th>
+                            <? 
+                                const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                                months.forEach(m => { ?> <th class="px-3 py-2 text-xs font-medium text-gray-600 uppercase"><?= m ?></th> <? }); 
+                            ?>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <? 
+                            const paidMonths = new Set(participante.estadoAportes.mesesPagados);
+                            const currentYear = new Date().getFullYear();
+                            const startYear = 2022;
+
+                            for (let year = startYear; year <= currentYear; year++) {
+                                ?> <tr><td class="px-3 py-2 text-sm font-semibold"><?= year ?></td> <?
+                                for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+                                    const mesAnio = `${(monthIndex + 1).toString().padStart(2, '0')}/${year}`;
+                                    const isPaid = paidMonths.has(mesAnio);
+                                    const icon = isPaid 
+                                        ? '<span class="text-green-500 font-bold">&#10003;</span>' 
+                                        : '<span class="text-red-500 font-bold">&#10006;</span>';   
+                                    ?> <td class="px-3 py-2 whitespace-nowrap text-sm"><?= icon ?></td> <?
+                                }
+                                ?> </tr> <?
+                            }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Detalle de Pagos Realizados</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora Pago</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mes Cubierto</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Recibido</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable del Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <? historialPagos.forEach(pago => { ?>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?= pago.fecha ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= pago.mesCubierto ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">$<?= pago.montoPagado.toLocaleString('es-CO') ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= pago.registrador ?></td>
+                            </tr>
+                        <? }); ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
